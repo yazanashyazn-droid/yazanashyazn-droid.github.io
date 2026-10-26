@@ -1,7 +1,7 @@
 ---
 import { getImage } from 'astro:assets';
 import '../styles/global.css';
-import { useT, type Lang } from '../i18n/ui';
+import { useT, contact, type Lang } from '../i18n/ui';
 import ogSource from '../assets/pages/p01.webp';
 
 interface Props {
@@ -15,6 +15,21 @@ const urls = { ar: base, en: `${base}en/` };
 const canonical = new URL(urls[lang], Astro.site);
 const og = await getImage({ src: ogSource, width: 1200, format: 'jpg', quality: 82 });
 const ogUrl = new URL(og.src, Astro.site);
+
+// Structured data for search engines (a data block, not executed — unaffected by the CSP).
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: t('about.name'),
+  alternateName: lang === 'ar' ? 'Yazan Aboushaar' : 'يزن أبوشعر',
+  jobTitle: t('about.role'),
+  url: canonical.href,
+  image: ogUrl.href,
+  address: { '@type': 'PostalAddress', addressLocality: 'Damascus', addressCountry: 'SY' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'International University for Science & Technology (IUST)' },
+  sameAs: [`https://instagram.com/${contact.instagram}`],
+  knowsAbout: ['Visual identity', 'Logo design', 'Social media design', 'Print design', '3D rendering', 'Architecture'],
+};
 
 // GitHub Pages can't send security headers, so the policy ships as a meta tag (production only:
 // the dev server injects inline scripts for HMR).
@@ -58,7 +73,10 @@ const csp = [
     <meta property="og:image" content={ogUrl} />
     <meta property="og:locale" content={lang === 'ar' ? 'ar_SY' : 'en_US'} />
     <meta name="twitter:card" content="summary_large_image" />
-    <script src={`${base}js/lang.js`}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />
+    <!-- is:inline keeps this a plain blocking external script (not bundled/deferred) so the
+         language redirect and the .js class happen before first paint -->
+    <script is:inline src={`${base}js/lang.js`}></script>
   </head>
   <body>
     <a class="skip-link" href="#main">{t('skip')}</a>

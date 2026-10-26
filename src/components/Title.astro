@@ -6,4 +6,4 @@ interface Props {
 const [strong, light] = Astro.props.text.split('|');
 ---
 
-<span class="t-strong">{strong}</span>{light && <span class="t-light">{light}</span>}
+<span class="t-strong">{strong}</span>{light && " "}{light && <span class="t-light">{light}</span>}

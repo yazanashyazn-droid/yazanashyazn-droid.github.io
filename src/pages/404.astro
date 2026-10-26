@@ -1,0 +1,67 @@
+---
+import '../styles/global.css';
+import Logo from '../components/Logo.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>404 | YZN</title>
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+  </head>
+  <body class="bg-grid-dark">
+    <main class="nf">
+      <Logo class="nf__logo" />
+      <p class="nf__code display" dir="ltr">404</p>
+      <h1 class="nf__title">الصفحة مو موجودة</h1>
+      <p class="nf__en" lang="en" dir="ltr">This page doesn’t exist.</p>
+      <div class="nf__links">
+        <a class="pill pill--accent" href={base}>الرئيسية</a>
+        <a class="pill pill--ghost" href={`${base}en/`} lang="en">Home</a>
+      </div>
+    </main>
+  </body>
+</html>
+
+<style>
+  .nf {
+    min-height: 100dvh;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: var(--sp-4);
+    padding: var(--gutter);
+    text-align: center;
+  }
+
+  .nf__logo {
+    width: 120px;
+    color: var(--text);
+  }
+
+  .nf__code {
+    font-size: var(--fs-display);
+    color: var(--accent);
+    line-height: 0.9;
+  }
+
+  .nf__title {
+    font-size: var(--fs-xl);
+    font-weight: 600;
+  }
+
+  .nf__en {
+    color: var(--text-muted);
+  }
+
+  .nf__links {
+    display: flex;
+    gap: var(--sp-3);
+    margin-top: var(--sp-4);
+  }
+</style>

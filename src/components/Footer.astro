@@ -1,0 +1,220 @@
+---
+import Logo from './Logo.astro';
+import { useT, contact, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'ar' ? 'en' : 'ar';
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const otherUrl = other === 'ar' ? base : `${base}en/`;
+const year = new Date().getFullYear();
+const links = [
+  { href: '#work', label: t('nav.work') },
+  { href: '#services', label: t('nav.services') },
+  { href: '#about', label: t('nav.about') },
+  { href: '#faq', label: t('nav.faq') },
+];
+---
+
+<footer class="footer" id="contact" aria-labelledby="footer-title">
+  <div class="container">
+    <span class="footer__kicker" data-reveal>{t('footer.kicker')}</span>
+    <h2 class="footer__title display" id="footer-title" data-reveal>
+      <span>{t('footer.title1')}</span>
+      <span class="footer__title-2 t-light">{t('footer.title2')}</span>
+    </h2>
+
+    <a
+      class="pill footer__cta"
+      href={`https://wa.me/${contact.phone}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-reveal
+    >
+      {t('footer.cta')}
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2"></path>
+      </svg>
+    </a>
+
+    <div class="footer__cols">
+      <div class="footer__col">
+        <h3 class="footer__h">{t('footer.contact')}</h3>
+        <ul>
+          <li>
+            <span class="footer__label">{t('footer.email')}</span>
+            <!-- Address is assembled in JS so plain-text scrapers don't harvest it -->
+            <a href="#contact" data-email-user={contact.emailUser} data-email-domain={contact.emailDomain} dir="ltr"
+              >{contact.emailUser} [at] {contact.emailDomain}</a
+            >
+          </li>
+          <li>
+            <span class="footer__label">{t('footer.phone')}</span>
+            <a href={`tel:+${contact.phone}`} dir="ltr">{contact.phoneDisplay}</a>
+          </li>
+          <li>
+            <span class="footer__label">{t('footer.instagram')}</span>
+            <a href={`https://instagram.com/${contact.instagram}`} target="_blank" rel="noopener noreferrer" dir="ltr"
+              >@{contact.instagram}</a
+            >
+          </li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h3 class="footer__h">{t('footer.explore')}</h3>
+        <ul>
+          {
+            links.map((l) => (
+              <li>
+                <a href={l.href}>{l.label}</a>
+              </li>
+            ))
+          }
+          <li>
+            <a href={otherUrl} hreflang={other} lang={other} data-lang-switch={other}
+              >{other === 'en' ? 'English' : 'العربية'}</a
+            >
+          </li>
+        </ul>
+      </div>
+      <p class="footer__location">{t('footer.location')}</p>
+    </div>
+
+    <Logo class="footer__logo" />
+
+    <div class="footer__bottom">
+      <span>© {year} {t('about.name')} — {t('footer.rights')}</span>
+      <a href="#top">{t('footer.top')} ↑</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    padding-block: clamp(5rem, 10vw, 9rem) var(--sp-8);
+    background: var(--accent);
+    color: var(--ink-900);
+    overflow: hidden;
+  }
+
+  .footer__kicker {
+    font-weight: 700;
+    font-size: var(--fs-md);
+  }
+
+  .footer__title {
+    display: grid;
+    font-size: var(--fs-display);
+    margin-block: var(--sp-4) var(--sp-8);
+    line-height: 0.95;
+  }
+
+  .footer__title-2 {
+    color: var(--paper);
+  }
+
+  .footer__cta {
+    background: var(--ink-900);
+    color: var(--paper);
+    font-size: var(--fs-md);
+    min-height: 56px;
+    padding-inline: var(--sp-8);
+  }
+
+  .footer__cta:hover {
+    background: var(--paper);
+    color: var(--ink-900);
+  }
+
+  :global([dir='rtl']) .footer__cta svg {
+    transform: scaleX(-1);
+  }
+
+  .footer__cols {
+    display: grid;
+    gap: var(--sp-8);
+    margin-top: clamp(4rem, 8vw, 7rem);
+    padding-top: var(--sp-8);
+    border-top: 1px solid rgb(22 22 22 / 0.25);
+  }
+
+  .footer__h {
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    margin-bottom: var(--sp-4);
+  }
+
+  .footer__col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .footer__col li {
+    display: grid;
+  }
+
+  .footer__label {
+    font-size: var(--fs-xs);
+    opacity: 0.75;
+  }
+
+  .footer__col a {
+    font-weight: 600;
+    text-decoration: none;
+    width: fit-content;
+    background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 2px;
+    transition: background-size 0.35s var(--ease-out);
+  }
+
+  :global([dir='rtl']) .footer__col a {
+    background-position: 100% 100%;
+  }
+
+  .footer__col a:hover {
+    background-size: 100% 2px;
+  }
+
+  .footer__col li span + a[dir='ltr'] {
+    justify-self: start;
+  }
+
+  .footer__location {
+    font-weight: 600;
+    max-width: 28ch;
+  }
+
+  .footer__logo {
+    width: 100%;
+    margin-top: clamp(3rem, 8vw, 6rem);
+    color: var(--ink-900);
+    --accent: var(--paper);
+  }
+
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    margin-top: var(--sp-8);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+  }
+
+  .footer__bottom a {
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  @media (min-width: 768px) {
+    .footer__cols {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+</style>

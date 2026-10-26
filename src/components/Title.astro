@@ -1,0 +1,9 @@
+---
+// Renders "strong part|light part" copy as a two-weight display title.
+interface Props {
+  text: string;
+}
+const [strong, light] = Astro.props.text.split('|');
+---
+
+<span class="t-strong">{strong}</span>{light && <span class="t-light">{light}</span>}

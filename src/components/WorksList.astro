@@ -1,0 +1,350 @@
+---
+import { Image } from 'astro:assets';
+import { useT, pick, type Lang } from '../i18n/ui';
+import { projects, img } from '../data/works';
+import Title from './Title.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+
+<section class="works bg-grid-dark" id="work" aria-labelledby="work-title">
+  <div class="container">
+    <header class="works__head" data-reveal>
+      <span class="kicker">{t('work.kicker')}</span>
+      <h2 class="works__title display" id="work-title"><Title text={t('work.title')} /></h2>
+    </header>
+
+    <ul class="works__list" data-works>
+      {
+        projects.map((p, i) => (
+          <li class="row" data-reveal>
+            <a
+              class="row__link"
+              href={`#work-${p.id}`}
+              data-gallery-open={p.id}
+              data-preview={i}
+              data-cursor-label={t('work.view')}
+            >
+              <span class="row__num tech" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span class="row__thumb" aria-hidden="true">
+                <Image src={img(p.cover)} alt="" widths={[320, 640]} sizes="40vw" />
+              </span>
+              <span class="row__title display">{pick(p.title, lang)}</span>
+              <span class="row__meta">
+                <span class="row__tag">{pick(p.category, lang)}</span>
+                <span class="row__year tech" dir="ltr">
+                  {p.year}
+                </span>
+              </span>
+              <span class="row__more">
+                {t('work.more')}
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" />
+                </svg>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <!-- Floating preview that follows the cursor (pointer devices only) -->
+  <div class="preview" data-preview-box aria-hidden="true">
+    <div class="preview__card paper">
+      <span class="tape preview__tape"></span>
+      <div class="preview__stack">
+        {
+          projects.map((p, i) => (
+            <Image
+              class="preview__img"
+              data-preview-img={i}
+              src={img(p.cover)}
+              alt=""
+              widths={[420, 840]}
+              sizes="420px"
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .works {
+    position: relative;
+    padding-block: clamp(5rem, 10vw, 9rem);
+  }
+
+  .works__head {
+    display: grid;
+    gap: var(--sp-4);
+    margin-bottom: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .works__title {
+    font-size: var(--fs-3xl);
+    max-width: 14ch;
+  }
+
+  .works__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid rgb(255 255 255 / 0.14);
+  }
+
+  .row {
+    border-bottom: 1px solid rgb(255 255 255 / 0.14);
+  }
+
+  .row__link {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3rem 1fr auto;
+    grid-template-areas: 'num title meta';
+    align-items: center;
+    gap: var(--sp-4) var(--sp-6);
+    padding-block: clamp(1.25rem, 2.6vw, 2.25rem);
+    text-decoration: none;
+    isolation: isolate;
+  }
+
+  /* Coral wipe on hover */
+  .row__link::before {
+    content: '';
+    position: absolute;
+    inset: 0 calc(-1 * var(--gutter));
+    z-index: -1;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.45s var(--ease-out);
+  }
+
+  .row__link:hover::before,
+  .row__link:focus-visible::before {
+    transform: scaleY(1);
+  }
+
+  .row__link:hover,
+  .row__link:focus-visible {
+    color: var(--ink-900);
+  }
+
+  .row__num {
+    grid-area: num;
+    font-size: var(--fs-sm);
+    color: var(--accent);
+    transition: color var(--dur-base);
+  }
+
+  .row__link:hover .row__num {
+    color: var(--ink-900);
+  }
+
+  .row__title {
+    grid-area: title;
+    font-size: clamp(2rem, 1rem + 4.5vw, 5.5rem);
+    transition: transform 0.45s var(--ease-out);
+  }
+
+  .row__link:hover .row__title {
+    transform: translateX(1.5rem);
+  }
+
+  :global([dir='rtl']) .row__link:hover .row__title {
+    transform: translateX(-1.5rem);
+  }
+
+  .row__meta {
+    grid-area: meta;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+  }
+
+  .row__tag {
+    padding: var(--sp-1) var(--sp-4);
+    border: 1px solid currentColor;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .row__year {
+    font-size: var(--fs-xs);
+    opacity: 0.7;
+    white-space: nowrap;
+  }
+
+  .row__more {
+    display: none;
+  }
+
+  .row__thumb {
+    display: none;
+  }
+
+  /* Cursor-follow preview */
+  .preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    width: clamp(240px, 22vw, 360px);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .preview__card {
+    transform: translate(-50%, -50%);
+  }
+
+  .preview__tape {
+    top: -14px;
+    left: 50%;
+    translate: -50% 0;
+    rotate: -4deg;
+  }
+
+  .preview__stack {
+    display: grid;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--ink-700);
+  }
+
+  .preview__img {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .preview__img.is-active {
+    opacity: 1;
+  }
+
+  @media (hover: none), (pointer: coarse), (max-width: 767px) {
+    .preview {
+      display: none;
+    }
+  }
+
+  /* Mobile: projects become a deck of taped paper cards that stack while scrolling */
+  @media (max-width: 767px) {
+    .works__list {
+      display: grid;
+      gap: var(--sp-8);
+      border: 0;
+      padding-bottom: var(--sp-8);
+    }
+    .row {
+      position: sticky;
+      top: calc(5.25rem + var(--i, 0) * 0.85rem);
+      border: 0;
+    }
+    .row:nth-child(2) { --i: 1; }
+    .row:nth-child(3) { --i: 2; }
+    .row:nth-child(4) { --i: 3; }
+    .row:nth-child(5) { --i: 4; }
+    .row:nth-child(6) { --i: 5; }
+    .row:nth-child(7) { --i: 6; }
+    .row__link {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        'thumb thumb'
+        'title title'
+        'meta more';
+      gap: var(--sp-3);
+      padding: 10px 10px var(--sp-4);
+      background: var(--paper);
+      color: var(--ink-900);
+      box-shadow: 0 -10px 30px -12px rgb(0 0 0 / 0.6);
+      rotate: -1.2deg;
+      transform-origin: 50% 0;
+    }
+    .row:nth-child(even) .row__link {
+      rotate: 1.2deg;
+    }
+    .row__link::before {
+      display: none;
+    }
+    .row__link:hover {
+      color: var(--ink-900);
+    }
+    .row__link:active {
+      scale: 0.98;
+    }
+    .row__num {
+      grid-area: thumb;
+      align-self: start;
+      justify-self: start;
+      z-index: 1;
+      margin: 10px;
+      padding: 2px 10px;
+      background: var(--ink-900);
+      color: var(--accent);
+      font-size: var(--fs-md);
+      font-weight: 700;
+      border-radius: 0 0 10px 0;
+    }
+    .row__thumb {
+      grid-area: thumb;
+      display: block;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      background: var(--ink-700);
+    }
+    .row__thumb :global(img) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .row__title {
+      font-size: clamp(1.9rem, 1rem + 5vw, 2.6rem);
+      padding-inline: var(--sp-2);
+    }
+    .row__link:hover .row__title,
+    :global([dir='rtl']) .row__link:hover .row__title {
+      transform: none;
+    }
+    .row__link:hover .row__num {
+      color: var(--accent);
+    }
+    .row__meta {
+      flex-wrap: wrap;
+      gap: var(--sp-2);
+      padding-inline: var(--sp-2);
+    }
+    .row__year {
+      display: none;
+    }
+    .row__more {
+      grid-area: more;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      padding-inline: var(--sp-2);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      white-space: nowrap;
+      color: var(--accent-on-cream);
+    }
+    :global([dir='rtl']) .row__more svg {
+      transform: scaleX(-1);
+    }
+  }
+</style>

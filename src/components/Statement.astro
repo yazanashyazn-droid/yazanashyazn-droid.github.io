@@ -1,0 +1,85 @@
+---
+import { useT, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const t = useT(Astro.props.lang);
+// Split at build time so the scroll reveal needs no runtime text splitting.
+// *asterisks* in the copy mark emphasised (bold, coral) words.
+let open = false;
+const words = t('statement')
+  .split(/\s+/)
+  .map((raw) => {
+    const stars = (raw.match(/\*/g) ?? []).length;
+    const em = open || stars > 0;
+    if (stars % 2) open = !open;
+    return { text: raw.replaceAll('*', ''), em };
+  });
+---
+
+<section class="statement bg-grid-dark" id="statement" aria-label={t('nav.about')}>
+  <div class="container statement__inner">
+    <p class="statement__text" data-statement>
+      {
+        words.map((w) => (
+          <>
+            <span class:list={['w', { 'w--em': w.em }]}>{w.text}</span>{' '}
+          </>
+        ))
+      }
+    </p>
+    <p class="statement__sub" data-reveal>{t('statement.sub')}</p>
+  </div>
+</section>
+
+<style>
+  .statement {
+    position: relative;
+    z-index: 1;
+    padding-block: clamp(6rem, 14vw, 12rem);
+  }
+
+  .statement__inner {
+    display: grid;
+    gap: var(--sp-12);
+  }
+
+  .statement__text {
+    font-size: clamp(1.75rem, 1rem + 3.4vw, 4.25rem);
+    font-weight: 250;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    max-width: 22ch;
+  }
+
+  .w--em {
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  :global([lang='en']) .statement__text {
+    max-width: 26ch;
+  }
+
+  .w {
+    transition: opacity 0.2s;
+  }
+
+  :global(.js) .w {
+    opacity: 0.16;
+  }
+
+  .statement__sub {
+    max-width: 52ch;
+    margin-inline-start: auto;
+    font-size: var(--fs-md);
+    color: var(--text-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .w {
+      opacity: 1;
+    }
+  }
+</style>

@@ -1,0 +1,62 @@
+---
+import Logo from './Logo.astro';
+import { useT, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const t = useT(Astro.props.lang);
+---
+
+<div class="loader" data-loader role="status" aria-label={t('loader.label')}>
+  <div class="loader__inner">
+    <Logo class="loader__logo" wordmark={false} />
+    <span class="loader__count tech" data-loader-count aria-hidden="true">0</span>
+  </div>
+</div>
+
+<style>
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-loader);
+    display: none;
+    place-items: center;
+    background: var(--bg-deep);
+    /* Safety net: never trap the page if the script fails to run */
+    animation: loader-failsafe 0.4s ease 6s forwards;
+  }
+
+  :global(.js) .loader {
+    display: grid;
+  }
+
+  :global(.js.loaded) .loader {
+    display: none;
+  }
+
+  .loader__inner {
+    display: grid;
+    justify-items: center;
+    gap: var(--sp-6);
+  }
+
+  .loader__logo {
+    width: clamp(72px, 12vw, 120px);
+    color: var(--text);
+  }
+
+  .loader__count {
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+    min-width: 4ch;
+    text-align: center;
+  }
+
+  @keyframes loader-failsafe {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+</style>

@@ -1,0 +1,488 @@
+---
+import { Image } from 'astro:assets';
+import { useT, pick, experience, education, tools, type Lang } from '../i18n/ui';
+import portrait from '../assets/about/yazan.webp';
+import autocad from '../assets/tools/autocad.webp';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const [first, ...rest] = t('about.name').split(' ');
+const roles = t('about.role').split(' • ');
+---
+
+<section class="about bg-grid-cream" id="about" aria-labelledby="about-title">
+  <div class="container">
+    <div class="intro">
+      <!-- Collage portrait: cut-out photo popping out of a torn coral paper shape -->
+      <figure class="portrait" data-reveal>
+        <span class="portrait__paper" aria-hidden="true"></span>
+        <span class="portrait__grid" aria-hidden="true"></span>
+        <Image
+          class="portrait__img"
+          src={portrait}
+          alt={t('about.name')}
+          widths={[400, 800, 1200]}
+          sizes="(min-width: 1024px) 36vw, 86vw"
+        />
+        <span class="sticker sticker--pin">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"
+            ><path d="M12 22s7-7.6 7-13a7 7 0 10-14 0c0 5.4 7 13 7 13z" fill="currentColor"></path><circle
+              cx="12"
+              cy="9"
+              r="2.6"
+              fill="var(--paper)"></circle></svg
+          >
+          {t('about.location')}
+        </span>
+        <span class="sticker sticker--year tech" dir="ltr">2021 → {t('present')}</span>
+        <span class="tape portrait__tape" aria-hidden="true"></span>
+      </figure>
+
+      <div class="intro__text">
+        <span class="kicker" data-reveal>{t('about.kicker')}</span>
+        <h2 class="name display" id="about-title" data-reveal>
+          <span class="name__box selection">
+            <span class="name__first">{first}</span>
+            <span class="name__last t-light">{rest.join(' ')}</span>
+          </span>
+        </h2>
+        <ul class="roles" data-reveal>
+          {roles.map((r) => <li>{r}</li>)}
+        </ul>
+        <div class="bio" data-reveal>
+          <p>{t('about.p1')}</p>
+          <p>{t('about.p2')}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cv">
+      <h3 class="cv__h display" data-reveal>
+        <span class="cv__num tech">01</span>
+        {t('experience.title')}
+      </h3>
+      <ol class="cards">
+        {
+          experience.map((e, i) => (
+            <li class="card" data-reveal>
+              <span class="card__years tech" dir="ltr">
+                {e.from} — {e.to ?? t('present')}
+              </span>
+              <strong class="card__org">{pick(e.org, lang)}</strong>
+              <span class="card__role">{pick(e.role, lang)}</span>
+              {e.to === null && <span class="card__live" aria-hidden="true" />}
+              <span class="card__idx tech" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+            </li>
+          ))
+        }
+        <li class="card card--edu" data-reveal>
+          <span class="card__label">{t('education.title')}</span>
+          <span class="card__years tech" dir="ltr">{education.from} — {education.to}</span>
+          <strong class="card__org">{pick(education.degree, lang)}</strong>
+          <span class="card__role">{pick(education.school, lang)}</span>
+        </li>
+      </ol>
+
+      <h3 class="cv__h display" data-reveal>
+        <span class="cv__num tech">02</span>
+        {t('tools.title')}
+      </h3>
+      <ul class="tools" data-reveal>
+        {
+          tools.map((tool) => (
+            <li class="tool">
+              {tool.label === 'AutoCAD' ? (
+                <Image class="tool__icon" src={autocad} alt="" width={56} height={56} />
+              ) : (
+                <span class={`tool__icon tool__icon--${tool.short.toLowerCase()}`} aria-hidden="true">
+                  {tool.short}
+                </span>
+              )}
+              <span class="tool__name">{tool.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    padding-block: clamp(5rem, 10vw, 9rem);
+    overflow: hidden;
+  }
+
+  /* ---------- Intro: portrait + name ---------- */
+  .intro {
+    display: grid;
+    gap: clamp(3rem, 6vw, 6rem);
+    align-items: center;
+  }
+
+  .portrait {
+    position: relative;
+    margin: 0;
+    width: min(100%, 30rem);
+    justify-self: center;
+    padding-top: 12%;
+    isolation: isolate;
+    --torn: polygon(
+      6% 4%, 22% 0%, 38% 5%, 55% 1%, 71% 6%, 88% 2%, 97% 12%, 94% 30%, 100% 48%, 95% 66%, 99% 84%, 93% 100%,
+      70% 97%, 50% 100%, 28% 96%, 8% 100%, 2% 82%, 6% 63%, 0% 44%, 5% 26%
+    );
+  }
+
+  /* Torn coral paper behind the photo (like the PDF's CV page) */
+  .portrait__paper {
+    position: absolute;
+    inset: 22% 4% 0 4%;
+    z-index: -2;
+    background: var(--accent);
+    clip-path: var(--torn);
+    transition: transform 0.6s var(--ease-spring);
+  }
+
+  .portrait__grid {
+    position: absolute;
+    inset: 22% 4% 0 4%;
+    z-index: -1;
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.12) 1px, transparent 1px);
+    background-size: 24px 24px;
+    clip-path: var(--torn);
+    pointer-events: none;
+  }
+
+  .portrait__img {
+    position: relative;
+    width: 100%;
+    filter: drop-shadow(0 24px 30px rgb(0 0 0 / 0.25));
+    transform-origin: 50% 100%;
+    transition: transform 0.6s var(--ease-spring);
+  }
+
+  .portrait:hover .portrait__img {
+    transform: scale(1.03) rotate(-1deg);
+  }
+
+  .portrait:hover .portrait__paper {
+    transform: rotate(2deg) scale(1.02);
+  }
+
+  .portrait__tape {
+    top: 20%;
+    inset-inline-end: -2%;
+    rotate: 35deg;
+    background: rgb(255 255 255 / 0.55);
+  }
+
+  .sticker {
+    position: absolute;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-4);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    box-shadow: var(--shadow-paper);
+    transition: transform 0.5s var(--ease-spring);
+  }
+
+  .sticker--pin {
+    top: 34%;
+    inset-inline-start: -6%;
+    background: var(--paper);
+    color: var(--ink-900);
+    rotate: -6deg;
+  }
+
+  .sticker--pin svg {
+    color: var(--accent-on-cream);
+  }
+
+  .sticker--year {
+    bottom: 8%;
+    inset-inline-end: -4%;
+    background: var(--sticker);
+    color: var(--paper);
+    rotate: 5deg;
+    font-weight: 700;
+  }
+
+  .sticker:hover,
+  .portrait:hover .sticker--pin {
+    transform: translateY(-6px) rotate(-3deg);
+  }
+
+  .portrait:hover .sticker--year {
+    transform: translateY(-6px) rotate(3deg);
+  }
+
+  .intro__text {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  .name {
+    font-size: var(--fs-3xl);
+  }
+
+  .name__box {
+    display: inline-grid;
+    padding: 0.05em 0.2em 0.1em;
+    background: var(--paper);
+    transition: outline-color 0.3s;
+  }
+
+  .name__box:hover {
+    outline-color: var(--accent-2);
+  }
+
+  .name__first {
+    color: var(--ink-900);
+  }
+
+  .name__last {
+    color: var(--accent-on-cream);
+  }
+
+  .roles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  .roles li {
+    padding: var(--sp-1) var(--sp-4);
+    border: 1px solid var(--ink-900);
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    transition:
+      background-color 0.3s,
+      color 0.3s,
+      transform 0.4s var(--ease-spring);
+  }
+
+  .roles li:hover {
+    background: var(--ink-900);
+    color: var(--paper);
+    transform: translateY(-3px) rotate(-2deg);
+  }
+
+  .bio {
+    display: grid;
+    gap: var(--sp-4);
+    color: var(--text-on-cream-muted);
+    font-size: var(--fs-md);
+    max-width: 60ch;
+  }
+
+  /* ---------- CV cards ---------- */
+  .cv {
+    margin-top: clamp(4rem, 8vw, 7rem);
+  }
+
+  .cv__h {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-3);
+    font-size: var(--fs-xl);
+    margin-block: var(--sp-12) var(--sp-6);
+    color: var(--ink-900);
+  }
+
+  .cv__num {
+    font-size: var(--fs-sm);
+    color: var(--accent-on-cream);
+  }
+
+  .cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: var(--sp-4);
+  }
+
+  .card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    min-height: 11rem;
+    padding: var(--sp-6);
+    background: var(--paper);
+    border: 1px solid var(--paper-300);
+    box-shadow: 0 2px 0 var(--paper-300);
+    transition:
+      transform 0.45s var(--ease-spring),
+      box-shadow 0.45s var(--ease-out),
+      border-color 0.3s;
+  }
+
+  .card:hover {
+    transform: translateY(-6px) rotate(-0.8deg);
+    border-color: var(--accent);
+    box-shadow: 0 18px 30px -16px rgb(0 0 0 / 0.35);
+  }
+
+  .card:nth-child(even):hover {
+    transform: translateY(-6px) rotate(0.8deg);
+  }
+
+  .card__years {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    color: var(--accent-on-cream);
+    justify-self: start;
+  }
+
+  .card__org {
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .card__role {
+    color: var(--text-on-cream-muted);
+    font-size: var(--fs-sm);
+  }
+
+  .card__idx {
+    position: absolute;
+    bottom: var(--sp-4);
+    inset-inline-end: var(--sp-4);
+    font-size: var(--fs-xs);
+    color: var(--paper-300);
+    transition: color 0.3s;
+  }
+
+  .card:hover .card__idx {
+    color: var(--accent-on-cream);
+  }
+
+  /* Pulsing dot on current roles */
+  .card__live {
+    position: absolute;
+    top: var(--sp-6);
+    inset-inline-end: var(--sp-6);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2fa66a;
+    box-shadow: 0 0 0 0 rgb(47 166 106 / 0.5);
+    animation: live 2s infinite;
+  }
+
+  @keyframes live {
+    70% {
+      box-shadow: 0 0 0 10px rgb(47 166 106 / 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgb(47 166 106 / 0);
+    }
+  }
+
+  .card--edu {
+    background: var(--sticker);
+    border-color: var(--sticker);
+    color: var(--paper);
+  }
+
+  .card--edu .card__years,
+  .card--edu .card__role {
+    color: rgb(249 240 233 / 0.85);
+  }
+
+  .card__label {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- Tools ---------- */
+  .tools {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+    gap: var(--sp-3);
+  }
+
+  .tool {
+    display: grid;
+    justify-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-4) var(--sp-2);
+    background: var(--paper);
+    border: 1px solid var(--paper-300);
+    text-align: center;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    transition:
+      transform 0.45s var(--ease-spring),
+      border-color 0.3s;
+  }
+
+  .tool:hover {
+    transform: translateY(-6px);
+    border-color: var(--ink-900);
+  }
+
+  .tool:hover .tool__icon {
+    transform: rotate(-8deg) scale(1.1);
+  }
+
+  .tool__icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 1.3rem;
+    object-fit: contain;
+    transition: transform 0.45s var(--ease-spring);
+  }
+
+  .tool__icon--ps { background: #001e36; color: #31a8ff; box-shadow: inset 0 0 0 2px #31a8ff; }
+  .tool__icon--ai { background: #330000; color: #ff9a00; box-shadow: inset 0 0 0 2px #ff9a00; }
+  .tool__icon--id { background: #49021f; color: #ff3366; box-shadow: inset 0 0 0 2px #ff3366; }
+  .tool__icon--pr,
+  .tool__icon--ae { background: #00005b; color: #9999ff; box-shadow: inset 0 0 0 2px #9999ff; }
+  .tool__icon--bl { background: #e87d0d; color: #fff; border-radius: 50%; }
+  .tool__icon--su { background: #c4332d; color: #fff; }
+  .tool__icon--3 { background: #127b7b; color: #fff; }
+  .tool__icon--r { background: #186bff; color: #fff; }
+
+  @media (min-width: 1024px) {
+    .intro {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .sticker--pin {
+      inset-inline-start: 0;
+    }
+    .sticker--year {
+      inset-inline-end: 0;
+    }
+  }
+</style>

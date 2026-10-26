@@ -1,0 +1,183 @@
+---
+import { Image } from 'astro:assets';
+import { useT, pick, services, type Lang } from '../i18n/ui';
+import { img } from '../data/works';
+import Title from './Title.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+
+<section class="services bg-grid-dark" id="services" aria-labelledby="services-title">
+  <div class="container">
+    <header class="services__head" data-reveal>
+      <span class="kicker">{t('services.kicker')}</span>
+      <h2 class="services__title display" id="services-title"><Title text={t('services.title')} /></h2>
+    </header>
+
+    <ol class="services__list">
+      {
+        services.map((s, i) => (
+          <li class="svc" data-reveal>
+            <span class="svc__num tech" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <h3 class="svc__title display">{pick(s.title, lang)}</h3>
+            <p class="svc__text">{pick(s.text, lang)}</p>
+            <span class="svc__img cutout" aria-hidden="true">
+              <Image src={img(s.image)} alt="" widths={[240, 480]} sizes="240px" loading="lazy" />
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .services {
+    padding-block: clamp(5rem, 10vw, 9rem);
+  }
+
+  .services__head {
+    display: grid;
+    gap: var(--sp-4);
+    margin-bottom: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .services__title {
+    font-size: var(--fs-3xl);
+  }
+
+  .services__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .svc {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 22rem);
+    align-items: center;
+    gap: var(--sp-4) var(--sp-8);
+    padding-block: clamp(1.25rem, 2.4vw, 2rem);
+    border-bottom: 1px solid rgb(255 255 255 / 0.14);
+  }
+
+  .svc__num {
+    font-size: var(--fs-sm);
+    color: var(--accent-2);
+  }
+
+  .svc__title {
+    font-size: clamp(2rem, 1rem + 4vw, 5rem);
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--text);
+    transition: color 0.4s var(--ease-out);
+  }
+
+  /* Variable Arabic glyphs have overlapping contours that show through a stroke or any
+     translucent fill, so Arabic titles use an opaque muted colour instead. */
+  .svc__title:lang(ar) {
+    color: #77716c;
+    -webkit-text-stroke: 0;
+  }
+
+  .svc:hover .svc__title {
+    color: var(--accent);
+    -webkit-text-stroke-color: var(--accent);
+  }
+
+  .svc__text {
+    color: var(--text-muted);
+  }
+
+  .svc__img {
+    position: absolute;
+    top: 50%;
+    inset-inline-end: 34%;
+    width: clamp(120px, 14vw, 200px);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-50%) rotate(-8deg) scale(0.6);
+    transition:
+      opacity 0.3s,
+      transform 0.5s var(--ease-spring);
+  }
+
+  .svc:hover .svc__img {
+    opacity: 1;
+    transform: translateY(-50%) rotate(6deg) scale(1);
+  }
+
+  /* Mobile: swipeable deck of service cards, each with its cut-out image */
+  @media (max-width: 767px) {
+    .services__list {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 78%;
+      gap: var(--sp-4);
+      margin-inline: calc(-1 * var(--gutter));
+      padding: var(--sp-8) var(--gutter) var(--sp-12);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--gutter);
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+    }
+    .services__list::-webkit-scrollbar {
+      display: none;
+    }
+    .svc {
+      grid-template-columns: 1fr;
+      align-content: start;
+      gap: var(--sp-3);
+      min-height: 26rem;
+      padding: var(--sp-6);
+      border: 0;
+      background: var(--ink-700);
+      scroll-snap-align: start;
+      overflow: hidden;
+      rotate: -1deg;
+    }
+    .svc:nth-child(even) {
+      rotate: 1deg;
+      background: var(--sticker);
+    }
+    .svc:nth-child(even) .svc__num,
+    .svc:nth-child(even) .svc__text {
+      color: var(--paper);
+    }
+    .svc:nth-child(3n) {
+      background: var(--accent);
+      color: var(--ink-900);
+    }
+    .svc:nth-child(3n) .svc__num,
+    .svc:nth-child(3n) .svc__text {
+      color: var(--ink-900);
+    }
+    .svc__title,
+    .svc__title:lang(ar),
+    .svc:hover .svc__title {
+      color: inherit;
+      -webkit-text-stroke: 0;
+      font-size: clamp(2rem, 1rem + 6vw, 2.75rem);
+    }
+    .svc__img,
+    .svc:hover .svc__img {
+      display: block;
+      position: relative;
+      inset: auto;
+      top: auto;
+      justify-self: center;
+      width: 70%;
+      margin-top: auto;
+      opacity: 1;
+      transform: rotate(6deg);
+    }
+  }
+</style>

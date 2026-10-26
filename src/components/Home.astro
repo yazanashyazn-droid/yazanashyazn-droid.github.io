@@ -1,0 +1,47 @@
+---
+import Loader from './Loader.astro';
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import Statement from './Statement.astro';
+import WorksList from './WorksList.astro';
+import Sticker from './Sticker.astro';
+import Services from './Services.astro';
+import About from './About.astro';
+import Faq from './Faq.astro';
+import Footer from './Footer.astro';
+import Galleries from './Galleries.astro';
+import Fab from './Fab.astro';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<div class="cursor" data-cursor aria-hidden="true">
+  <div class="cursor__dot"><span class="cursor__label" data-cursor-text></span></div>
+</div>
+
+<Loader lang={lang} />
+<Header lang={lang} />
+
+<main id="main">
+  <Hero lang={lang} />
+  <Statement lang={lang} />
+  <WorksList lang={lang} />
+  <Sticker lang={lang} />
+  <Services lang={lang} />
+  <About lang={lang} />
+  <Faq lang={lang} />
+</main>
+
+<Footer lang={lang} />
+<Galleries lang={lang} />
+
+<Fab lang={lang} />
+
+
+<script>
+  import '../scripts/main';
+</script>

@@ -1,0 +1,67 @@
+---
+import { getImage } from 'astro:assets';
+import '../styles/global.css';
+import { useT, type Lang } from '../i18n/ui';
+import ogSource from '../assets/pages/p01.webp';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useT(lang);
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const urls = { ar: base, en: `${base}en/` };
+const canonical = new URL(urls[lang], Astro.site);
+const og = await getImage({ src: ogSource, width: 1200, format: 'jpg', quality: 82 });
+const ogUrl = new URL(og.src, Astro.site);
+
+// GitHub Pages can't send security headers, so the policy ships as a meta tag (production only:
+// the dev server injects inline scripts for HMR).
+const csp = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self'",
+  "img-src 'self' data:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "media-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  'upgrade-insecure-requests',
+].join('; ');
+---
+
+<!doctype html>
+<html lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'} data-alt-url={urls[lang === 'ar' ? 'en' : 'ar']}>
+  <head>
+    <meta charset="utf-8" />
+    {import.meta.env.PROD && <meta http-equiv="Content-Security-Policy" content={csp} />}
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#1e1e1e" />
+    <title>{t('meta.title')}</title>
+    <meta name="description" content={t('meta.description')} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="ar" href={new URL(urls.ar, Astro.site)} />
+    <link rel="alternate" hreflang="en" href={new URL(urls.en, Astro.site)} />
+    <link rel="alternate" hreflang="x-default" href={new URL(urls.ar, Astro.site)} />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="icon" sizes="48x48" href={`${base}favicon.ico`} />
+    <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={t('meta.title')} />
+    <meta property="og:description" content={t('meta.description')} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:locale" content={lang === 'ar' ? 'ar_SY' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script src={`${base}js/lang.js`}></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t('skip')}</a>
+    <slot />
+  </body>
+</html>

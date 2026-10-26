@@ -1,0 +1,246 @@
+---
+import Logo from './Logo.astro';
+import { useT, contact, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'ar' ? 'en' : 'ar';
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const otherUrl = other === 'ar' ? base : `${base}en/`;
+
+const links = [
+  { href: '#work', label: t('nav.work') },
+  { href: '#services', label: t('nav.services') },
+  { href: '#about', label: t('nav.about') },
+  { href: '#faq', label: t('nav.faq') },
+  { href: '#contact', label: t('nav.contact') },
+];
+---
+
+<header class="header" data-header>
+  <div class="header__bar">
+    <a class="header__logo" href="#top" aria-label={`YZN — ${t('nav.home')}`}>
+      <Logo class="header__logo-svg" />
+    </a>
+
+    <button
+      class="pill pill--ghost header__menu-btn"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      data-menu-toggle
+      data-label-open={t('nav.menu')}
+      data-label-close={t('nav.close')}
+    >
+      <span class="burger" aria-hidden="true"><span></span><span></span></span>
+      <span data-menu-label>{t('nav.menu')}</span>
+    </button>
+
+    <div class="header__actions">
+      <a
+        class="pill pill--ghost header__lang"
+        href={otherUrl}
+        hreflang={other}
+        lang={other}
+        data-lang-switch={other}
+        aria-label={t('lang.switchLabel')}>{t('lang.switch')}</a
+      >
+      <a class="pill pill--accent header__cta" href="#contact">{t('nav.cta')}</a>
+    </div>
+  </div>
+
+  <nav class="menu" id="site-menu" aria-label={t('nav.main')} data-menu hidden>
+    <ol class="menu__list">
+      {
+        links.map((l, i) => (
+          <li>
+            <a class="menu__link display" href={l.href} data-menu-link>
+              <span class="menu__num tech" aria-hidden="true">
+                0{i + 1}
+              </span>
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="menu__foot">
+      <a href={`https://wa.me/${contact.phone}`} target="_blank" rel="noopener noreferrer" dir="ltr"
+        >{contact.phoneDisplay}</a
+      >
+      <a href={`https://instagram.com/${contact.instagram}`} target="_blank" rel="noopener noreferrer" dir="ltr"
+        >@{contact.instagram}</a
+      >
+    </div>
+  </nav>
+</header>
+
+<style>
+  .header {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: var(--z-header);
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+
+  .header.is-hidden {
+    transform: translateY(-110%);
+  }
+
+  .header__bar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    padding: var(--sp-4) var(--gutter);
+  }
+
+  .header__logo {
+    display: block;
+    color: var(--text);
+    border-radius: var(--radius-sm);
+  }
+
+  .header__logo-svg {
+    width: clamp(78px, 8vw, 104px);
+  }
+
+  /* Over the coral menu the coral hook would vanish */
+  .header:has([aria-expanded='true']) .header__logo {
+    --accent: var(--ink-900);
+    color: var(--paper);
+  }
+
+  .header__menu-btn {
+    position: absolute;
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+  }
+
+  :global([dir='rtl']) .header__menu-btn {
+    transform: translateX(50%);
+  }
+
+  .header__menu-btn:active {
+    transform: translateX(-50%) scale(0.96);
+  }
+
+  :global([dir='rtl']) .header__menu-btn:active {
+    transform: translateX(50%) scale(0.96);
+  }
+
+  .burger {
+    display: grid;
+    gap: 5px;
+    width: 18px;
+  }
+
+  .burger span {
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+
+  [aria-expanded='true'] .burger span:first-child {
+    transform: translateY(3.5px) rotate(45deg);
+  }
+
+  [aria-expanded='true'] .burger span:last-child {
+    transform: translateY(-3.5px) rotate(-45deg);
+  }
+
+  .header__actions {
+    display: flex;
+    gap: var(--sp-2);
+  }
+
+  .header__lang {
+    padding-inline: var(--sp-4);
+    min-width: 44px;
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    align-content: center;
+    gap: var(--sp-12);
+    padding: 7rem var(--gutter) var(--sp-8);
+    background: var(--accent);
+    color: var(--ink-900);
+    clip-path: circle(0% at 50% 2.5rem);
+    transition: clip-path 0.7s var(--ease-out);
+    overflow-y: auto;
+  }
+
+  .menu[hidden] {
+    display: none;
+  }
+
+  .menu.is-open {
+    clip-path: circle(150% at 50% 2.5rem);
+  }
+
+  .menu__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    justify-items: center;
+    gap: var(--sp-2);
+  }
+
+  .menu__link {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--sp-3);
+    font-size: var(--fs-3xl);
+    text-decoration: none;
+    transition: color var(--dur-base);
+  }
+
+  .menu__link:hover {
+    color: var(--paper);
+  }
+
+  .menu__num {
+    font-size: var(--fs-sm);
+    margin-top: 0.6em;
+  }
+
+  .menu__foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sp-4) var(--sp-8);
+    font-weight: 600;
+  }
+
+  @media (max-width: 767px) {
+    .header__cta {
+      display: none;
+    }
+    .header__menu-btn {
+      position: static;
+      transform: none;
+      order: 2;
+    }
+    :global([dir='rtl']) .header__menu-btn,
+    .header__menu-btn:active,
+    :global([dir='rtl']) .header__menu-btn:active {
+      transform: none;
+    }
+    .header__actions {
+      order: 1;
+      margin-inline-start: auto;
+    }
+  }
+</style>

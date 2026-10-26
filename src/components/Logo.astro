@@ -1,0 +1,26 @@
+---
+// Original YZN logo, extracted as vectors from the portfolio Illustrator file
+// (mark paths from page 29, wordmark = Orbitron Regular outlines).
+interface Props {
+  class?: string;
+  wordmark?: boolean;
+  title?: string;
+}
+const { class: className, wordmark = true, title = 'YZN' } = Astro.props;
+---
+
+<svg class={className} viewBox={wordmark ? '228.77 175.51 342.2 154.96' : '228.77 175.51 147.56 154.96'} role="img" aria-label={title} xmlns="http://www.w3.org/2000/svg">
+  <path class="logo-hook" d="M238.56 179.07L228.77 212.66C240.13 215.97 268.34 226.81 285.1 255.93C295.16 273.43 297.23 290.85 297.19 302.41L297.13 330.39L332.11 330.47L332.18 302.5C332.23 286.68 329.36 262.73 315.42 238.49C292.33 198.34 253.98 183.57 238.56 179.07"></path>
+  <path class="logo-dot" d="M346.86 175.51C330.58 175.51 317.38 188.71 317.38 204.99C317.38 221.27 330.58 234.46 346.86 234.46C363.13 234.46 376.33 221.27 376.33 204.99C376.33 188.71 363.13 175.51 346.86 175.51"></path>
+  {wordmark && <path class="logo-word" d="M384.53 330.20L370.51 330.20L370.51 330.20L370.51 304.19L338.31 260.58L354.85 260.58L377.47 289.01L400.00 260.58L416.73 260.58L384.53 304.28L384.53 330.20ZM491.10 330.20L421.47 330.20L421.47 330.20L421.47 315.50L470.21 274.60L421.47 274.60L421.47 260.58L491.10 260.58L491.10 275.27L442.36 316.18L491.10 316.18L491.10 330.20ZM515.27 330.20L501.35 330.20L501.35 260.58L516.14 260.58L556.85 309.12L556.85 260.58L570.97 260.58L570.97 330.20L556.18 330.20L515.27 281.46L515.27 330.20Z" />}
+</svg>
+
+<style>
+  .logo-hook,
+  .logo-dot {
+    fill: var(--accent);
+  }
+  .logo-word {
+    fill: currentColor;
+  }
+</style>

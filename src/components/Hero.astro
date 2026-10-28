@@ -1,312 +1,358 @@
 ---
+// Bento hero after chandebootcamp.com: work cards, live pixel fields and the big title.
 import { Image } from 'astro:assets';
-import { useT, type Lang } from '../i18n/ui';
-import paper from '../assets/texture/paper-dark.webp';
-import ruler from '../assets/hero/ruler.webp';
-import laptop from '../assets/hero/laptop.webp';
-import palette from '../assets/hero/palette.webp';
-import headphones from '../assets/hero/headphones.webp';
+import Logo from './Logo.astro';
+import { useT, pick, type Lang } from '../i18n/ui';
+import { projects, img } from '../data/works';
 
 interface Props {
   lang: Lang;
 }
-const t = useT(Astro.props.lang);
-
-// Desk objects from the PDF cover. `depth` drives mouse parallax and scroll scatter.
-const objects = [
-  { src: ruler, cls: 'obj--ruler', depth: 0.6, w: 520 },
-  { src: laptop, cls: 'obj--laptop', depth: 0.9, w: 720 },
-  { src: palette, cls: 'obj--palette', depth: 0.7, w: 560 },
-  { src: headphones, cls: 'obj--headphones', depth: 1, w: 480 },
+const { lang } = Astro.props;
+const t = useT(lang);
+const byId = (id: string) => projects.find((p) => p.id === id)!;
+const cards = [
+  { p: byId('smash'), area: 'c1', tone: 'ink' },
+  { p: byId('nawaf'), area: 'c2', tone: 'coral' },
+  { p: byId('afia'), area: 'c3', tone: 'blue' },
+  { p: byId('logos'), area: 'c4', tone: 'paper' },
 ];
 ---
 
 <section class="hero" id="top" data-hero aria-labelledby="hero-title">
-  <div class="hero__sticky">
-    <Image class="hero__paper" src={paper} alt="" widths={[1200, 2400]} sizes="100vw" loading="eager" />
-    <div class="hero__grid" aria-hidden="true"></div>
+  <div class="bento">
+    <div class="cell info" data-bento>
+      <div class="info__top">
+        <span class="tech info__year" dir="ltr">(©26)</span>
+      </div>
+      <div class="info__body">
+        <p class="info__date">{t('hero.date')}</p>
+        <p class="info__city">{t('about.location')}</p>
+        <p class="info__text">{t('hero.info')}</p>
+        <a class="reel" href="#work" data-perch>
+          <Image src={img('works/smash/table.webp')} alt="" widths={[240, 480]} sizes="200px" loading="eager" />
+          <span class="reel__label">{t('hero.reel')}</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="cell px" data-area="pxA" data-bento><canvas data-pixel="coral" aria-hidden="true"></canvas></div>
+    <div class="cell px" data-area="pxB" data-bento><canvas data-pixel="blue" data-tile="16" aria-hidden="true"></canvas></div>
+    <div class="cell px" data-area="pxC" data-bento><canvas data-pixel="coral" data-tile="12" aria-hidden="true"></canvas></div>
+    <div class="cell px" data-area="pxD" data-bento><canvas data-pixel="cream" aria-hidden="true"></canvas></div>
 
     {
-      objects.map((o) => (
-        <div class={`obj ${o.cls}`} data-hero-obj data-depth={o.depth} aria-hidden="true">
+      cards.map(({ p, area, tone }, i) => (
+        <a
+          class={`cell card card--${tone}`}
+          data-area={area}
+          href={`#work-${p.id}`}
+          data-gallery-open={p.id}
+          data-cursor-label={t('work.view')}
+          data-bento
+          data-perch
+        >
           <Image
-            src={o.src}
+            class="card__img"
+            src={img(p.cover)}
             alt=""
-            widths={[Math.round(o.w / 2), o.w]}
-            sizes={`(min-width: 1024px) ${Math.round(o.w / 2)}px, 35vw`}
+            widths={[360, 720]}
+            sizes="(min-width: 900px) 25vw, 50vw"
             loading="eager"
           />
-        </div>
+          <span class="card__label">
+            <span class="tech">{String(i + 1).padStart(2, '0')}</span>
+            {pick(p.title, lang)}
+          </span>
+        </a>
       ))
     }
 
-    <div class="hero__title-wrap" data-hero-title>
-      <span class="guide guide--h1" aria-hidden="true"></span>
-      <span class="guide guide--h2" aria-hidden="true"></span>
-      <span class="guide guide--h3" aria-hidden="true"></span>
-      <span class="guide guide--v1" aria-hidden="true"></span>
-      <span class="guide guide--v2" aria-hidden="true"></span>
-
-      <h1 class="hero__title" id="hero-title" dir="ltr">
-        <span class="hero__line hero__line--1">
-          <span class="hero__kicker tech" data-hero-word>{t('hero.kicker')}</span>{" "}
-          <span class="hero__design" data-hero-word>{t('hero.title1')}</span>
-        </span>{" "}
-        <span class="hero__portfolio display" data-hero-word>
-          {t('hero.title2')}<span class="hero__diamond" aria-hidden="true"></span>
-        </span>
-        {" "}<span class="hero__year tech" data-hero-word>{t('hero.year')}</span>
+    <div class="cell title" data-bento>
+      <Logo class="title__mark" wordmark={false} />
+      <h1 class="title__h display" id="hero-title" dir="ltr">
+        <span>{t('hero.titleA')}</span>
+        <span>{t('hero.titleB')}</span>
+        <span class="title__last">{t('hero.titleC')} <span class="title__c">(©26)</span></span>
         <span class="visually-hidden"> — {t('about.name')}</span>
       </h1>
     </div>
-
-    <div class="hero__foot container">
-      <p class="hero__role" data-hero-foot>{t('hero.role')}</p>
-      <a class="hero__scroll" href="#statement" data-hero-foot>
-        <span>{t('hero.scroll')}</span>
-        <span class="hero__scroll-line" aria-hidden="true"></span>
-      </a>
-    </div>
   </div>
+
+  <a class="scroll-more" href="#statement">
+    {t('hero.scrollMore')}
+    <span class="scroll-more__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+  </a>
 </section>
 
 <style>
   .hero {
     position: relative;
-    height: 200vh;
-    background: var(--bg-deep);
+    background: var(--ink-900);
+    padding-top: 56px;
   }
 
-  .hero__sticky {
-    position: sticky;
-    top: 0;
-    height: 100dvh;
-    min-height: 560px;
-    overflow: hidden;
+  .bento {
     display: grid;
-    place-items: center;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(6, minmax(0, 1fr));
+    grid-template-areas:
+      'info pxA pxB title'
+      'info c1  pxB title'
+      'info c1  c2  title'
+      'info pxC c2  title'
+      'info pxC c3  pxD'
+      'info c4  c3  pxD';
+    height: calc(100dvh - 56px);
+    min-height: 620px;
   }
 
-  .hero__paper {
+  .cell {
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  /* grid-area via data attribute (inline styles are blocked by the CSP) */
+  [data-area='pxA'] { grid-area: pxA; }
+  [data-area='pxB'] { grid-area: pxB; }
+  [data-area='pxC'] { grid-area: pxC; }
+  [data-area='pxD'] { grid-area: pxD; }
+  [data-area='c1'] { grid-area: c1; }
+  [data-area='c2'] { grid-area: c2; }
+  [data-area='c3'] { grid-area: c3; }
+  [data-area='c4'] { grid-area: c4; }
+
+  .px canvas {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    opacity: 0.9;
   }
 
-  .hero__grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--grid-line-dark) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-line-dark) 1px, transparent 1px);
-    background-size: 36px 36px;
+  /* Room for the fixed side tab on the right edge */
+  .info,
+  .title {
+    padding-right: 60px;
   }
 
-  .obj {
-    position: absolute;
-    z-index: 1;
-    will-change: transform;
-  }
-
-  .obj :global(img) {
-    width: 100%;
-    filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.55));
-  }
-
-  .obj--ruler {
-    width: clamp(150px, 24vw, 340px);
-    top: -2%;
-    left: -4%;
-    rotate: 8deg;
-  }
-
-  .obj--laptop {
-    width: clamp(200px, 34vw, 520px);
-    top: -14%;
-    right: -6%;
-    rotate: -28deg;
-  }
-
-  .obj--palette {
-    width: clamp(170px, 26vw, 380px);
-    bottom: -10%;
-    left: -5%;
-    rotate: 14deg;
-  }
-
-  .obj--headphones {
-    width: clamp(150px, 22vw, 320px);
-    bottom: -8%;
-    right: -2%;
-    rotate: -18deg;
-  }
-
-  .hero__title-wrap {
-    position: relative;
-    z-index: 2;
-    padding: clamp(1rem, 3vw, 2.5rem) clamp(1rem, 4vw, 3rem);
-  }
-
-  .hero__title {
-    display: grid;
-    justify-items: center;
-    color: var(--white);
-    line-height: 0.9;
-    font-weight: 400;
-  }
-
-  .hero__line--1 {
+  /* Info column */
+  .info {
+    grid-area: info;
     display: flex;
-    align-items: flex-end;
-    gap: 0.15em;
-    margin-inline-start: 18%;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--sp-6) var(--sp-4);
+    background: var(--ink-900);
+    color: var(--paper);
+    border-inline-end: 1px solid rgb(255 255 255 / 0.06);
   }
 
-  .hero__kicker {
-    font-size: clamp(1.1rem, 0.6rem + 2.2vw, 3rem);
-    font-weight: 400;
-    padding-bottom: 0.35em;
-  }
-
-  .hero__design {
-    font-size: clamp(2.8rem, 1.2rem + 7vw, 8.5rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-
-  .hero__portfolio {
-    position: relative;
-    font-size: var(--fs-display);
+  .info__year {
+    font-size: var(--fs-sm);
     color: var(--accent);
-    line-height: 0.85;
-    letter-spacing: 0.005em;
   }
 
-  .hero__diamond {
+  .info__body {
+    display: grid;
+    gap: var(--sp-3);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .info__date {
+    color: var(--accent);
+  }
+
+  .info__text {
+    font-weight: 400;
+    color: var(--text-muted);
+    text-transform: none;
+    max-width: 28ch;
+  }
+
+  .reel {
+    position: relative;
+    display: block;
+    width: min(100%, 200px);
+    aspect-ratio: 16 / 10;
+    margin-top: var(--sp-4);
+    overflow: hidden;
+  }
+
+  .reel :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .reel:hover :global(img) {
+    transform: scale(1.08);
+  }
+
+  .reel__label {
     position: absolute;
-    top: 0.06em;
-    right: 0.32em;
-    width: 0.13em;
-    height: 0.13em;
+    bottom: 0;
+    inset-inline-start: 0;
+    padding: 2px 8px;
     background: var(--accent);
-    rotate: 45deg;
-    display: none;
-  }
-
-  .hero__year {
-    justify-self: end;
-    font-size: clamp(0.9rem, 0.5rem + 1.4vw, 1.9rem);
+    color: var(--ink-900);
+    font-family: var(--font-tech);
+    font-size: 0.65rem;
     font-weight: 700;
-    color: var(--accent-2);
-    margin-top: 0.3em;
   }
 
-  /* Dashed Illustrator guides around the title */
-  .guide {
+  /* Work cards */
+  .card {
+    display: block;
+    text-decoration: none;
+  }
+
+  .card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition:
+      transform 0.8s var(--ease-out),
+      filter 0.5s;
+  }
+
+  .card:hover .card__img {
+    transform: scale(1.06);
+  }
+
+  .card__label {
     position: absolute;
-    pointer-events: none;
-    --dash: repeating-linear-gradient(90deg, var(--guide) 0 10px, transparent 10px 18px);
-  }
-
-  .guide--h1,
-  .guide--h2,
-  .guide--h3 {
-    left: -8%;
-    right: -8%;
-    height: 1px;
-    background: var(--dash);
-    transform-origin: left;
-  }
-
-  .guide--h1 {
-    top: 6%;
-  }
-  .guide--h2 {
-    top: 42%;
-  }
-  .guide--h3 {
-    bottom: 14%;
-  }
-
-  .guide--v1,
-  .guide--v2 {
-    top: -6%;
-    bottom: -6%;
-    width: 1px;
-    background: repeating-linear-gradient(180deg, var(--guide) 0 10px, transparent 10px 18px);
-    transform-origin: top;
-  }
-
-  .guide--v1 {
-    left: 5%;
-  }
-  .guide--v2 {
-    right: 5%;
-  }
-
-  .hero__foot {
-    position: absolute;
-    z-index: 2;
-    bottom: var(--sp-8);
+    bottom: 0;
     inset-inline: 0;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: var(--sp-4);
-    font-size: var(--fs-sm);
-    color: var(--text-muted);
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-2) var(--sp-3);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: padding 0.4s var(--ease-out);
   }
 
-  .hero__scroll {
+  .card:hover .card__label {
+    padding-block: var(--sp-3);
+  }
+
+  .card--ink .card__label { background: var(--ink-900); color: var(--paper); }
+  .card--coral .card__label { background: var(--accent); color: var(--ink-900); }
+  .card--blue .card__label { background: var(--sticker); color: var(--paper); }
+  .card--paper .card__label { background: var(--paper); color: var(--ink-900); }
+
+  /* Title panel */
+  .title {
+    grid-area: title;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--sp-6) var(--sp-4) var(--sp-4);
+    background: var(--paper);
+    color: var(--ink-900);
+  }
+
+  .title__mark {
+    width: 46px;
+  }
+
+  .title__h {
+    display: grid;
+    font-size: clamp(2.6rem, 1rem + 4.2vw, 5.6rem);
+    line-height: 0.88;
+    text-align: start;
+  }
+
+  .title__last {
+    color: var(--accent-on-cream);
+  }
+
+  .title__c {
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: 0.7em;
+    color: var(--ink-900);
+  }
+
+  .scroll-more {
+    position: absolute;
+    bottom: var(--sp-4);
+    inset-inline-start: 25%;
+    z-index: 2;
     display: inline-flex;
     align-items: center;
     gap: var(--sp-3);
+    padding: var(--sp-2) var(--sp-4);
+    background: var(--ink-900);
+    color: var(--paper);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    text-transform: uppercase;
     text-decoration: none;
-    min-height: 44px;
   }
 
-  .hero__scroll-line {
-    width: 48px;
-    height: 1px;
-    background: currentColor;
-    transform-origin: left;
-    animation: scroll-line 1.8s var(--ease-out) infinite;
+  .scroll-more__dots {
+    display: inline-flex;
+    gap: 4px;
   }
 
-  @keyframes scroll-line {
-    0% {
-      transform: scaleX(0);
-    }
-    60% {
-      transform: scaleX(1);
-    }
-    100% {
-      transform: scaleX(1);
-      opacity: 0;
+  .scroll-more__dots i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: dot 1.2s infinite;
+  }
+
+  .scroll-more__dots i:nth-child(2) { animation-delay: 0.15s; }
+  .scroll-more__dots i:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes dot {
+    50% {
+      opacity: 0.2;
     }
   }
 
-  @media (max-width: 767px) {
-    .hero {
-      height: 160vh;
+  /* Tablet / phone: title first, then a two-column mosaic */
+  @media (max-width: 900px) {
+    .bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: auto repeat(4, 34vw) auto;
+      grid-template-areas:
+        'title title'
+        'c1    pxA'
+        'c1    c2'
+        'pxB   c2'
+        'c3    c4'
+        'info  info';
+      height: auto;
+      min-height: 0;
     }
-    .hero__role {
+    [data-area='pxC'],
+    [data-area='pxD'] {
       display: none;
     }
-    .hero__foot {
-      justify-content: center;
+    .title {
+      gap: var(--sp-8);
+      min-height: 62vw;
     }
-    .obj--laptop {
-      top: -6%;
+    .title__h {
+      font-size: clamp(3rem, 1rem + 11vw, 5rem);
     }
-    .obj--palette {
-      bottom: -4%;
+    .scroll-more {
+      display: none;
     }
-    .obj--headphones {
-      bottom: -2%;
+    .info {
+      gap: var(--sp-6);
     }
   }
 </style>

@@ -1,81 +1,95 @@
 ---
+// Big statement with image "pills" set inside the sentence ({0}, {1}, {2} in the copy).
+import { Image } from 'astro:assets';
 import { useT, type Lang } from '../i18n/ui';
+import { img } from '../data/works';
 
 interface Props {
   lang: Lang;
 }
 const t = useT(Astro.props.lang);
-// Split at build time so the scroll reveal needs no runtime text splitting.
-// *asterisks* in the copy mark emphasised (bold, coral) words.
-let open = false;
-const words = t('statement')
-  .split(/\s+/)
-  .map((raw) => {
-    const stars = (raw.match(/\*/g) ?? []).length;
-    const em = open || stars > 0;
-    if (stars % 2) open = !open;
-    return { text: raw.replaceAll('*', ''), em };
+const pills = [
+  { src: 'works/3d/perfume.webp', tone: 'coral' },
+  { src: 'logos/haykal.webp', tone: 'blue' },
+  { src: 'works/smash/phone.webp', tone: 'paper' },
+];
+const parts = t('statement2')
+  .split(/(\{\d\})/)
+  .flatMap((chunk) => {
+    const m = chunk.match(/^\{(\d)\}$/);
+    if (m) return [{ pill: Number(m[1]) }];
+    return chunk
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((w) => ({ word: w }));
   });
 ---
 
-<section class="statement bg-grid-dark" id="statement" aria-label={t('nav.about')}>
-  <div class="container statement__inner">
-    <p class="statement__text" data-statement>
-      {
-        words.map((w) => (
+<section class="statement" id="statement" aria-label={t('nav.about')}>
+  <p class="statement__text display" data-statement>
+    {
+      parts.map((p) =>
+        'pill' in p ? (
           <>
-            <span class:list={['w', { 'w--em': w.em }]}>{w.text}</span>{' '}
+            <span class={`pill-media pill-media--${pills[p.pill!].tone}`} aria-hidden="true" data-pill>
+              <Image src={img(pills[p.pill!].src)} alt="" widths={[200, 400]} sizes="160px" />
+            </span>{' '}
           </>
-        ))
-      }
-    </p>
-    <p class="statement__sub" data-reveal>{t('statement.sub')}</p>
-  </div>
+        ) : (
+          <>
+            <span class="w">{p.word}</span>{' '}
+          </>
+        ),
+      )
+    }
+  </p>
 </section>
 
 <style>
   .statement {
     position: relative;
-    z-index: 1;
-    padding-block: clamp(6rem, 14vw, 12rem);
-  }
-
-  .statement__inner {
-    display: grid;
-    gap: var(--sp-12);
+    padding: clamp(6rem, 14vw, 11rem) var(--gutter);
+    background: var(--ink-900);
+    border-top: 1px solid rgb(255 255 255 / 0.06);
   }
 
   .statement__text {
-    font-size: clamp(1.75rem, 1rem + 3.4vw, 4.25rem);
-    font-weight: 250;
+    max-width: 18ch;
+    margin-inline: auto;
+    font-size: clamp(2.4rem, 1rem + 5.4vw, 6.4rem);
+    line-height: 1.02;
+    text-align: center;
+    color: var(--paper);
+  }
+
+  .statement__text:lang(ar) {
     line-height: 1.4;
-    letter-spacing: -0.01em;
-    max-width: 22ch;
-  }
-
-  .w--em {
-    font-weight: 700;
-    color: var(--accent);
-  }
-
-  :global([lang='en']) .statement__text {
-    max-width: 26ch;
-  }
-
-  .w {
-    transition: opacity 0.2s;
   }
 
   :global(.js) .w {
-    opacity: 0.16;
+    opacity: 0.14;
   }
 
-  .statement__sub {
-    max-width: 52ch;
-    margin-inline-start: auto;
-    font-size: var(--fs-md);
-    color: var(--text-muted);
+  .pill-media {
+    display: inline-block;
+    width: 2.1em;
+    height: 0.82em;
+    vertical-align: -0.06em;
+    border-radius: 999px;
+    border: 0.09em solid;
+    overflow: hidden;
+    background: var(--ink-700);
   }
+
+  .pill-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .pill-media--coral { border-color: var(--accent); }
+  .pill-media--blue { border-color: var(--accent-2); }
+  .pill-media--paper { border-color: var(--paper); }
 
   @media (prefers-reduced-motion: reduce) {
     :global(.js) .w {

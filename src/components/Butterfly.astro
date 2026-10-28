@@ -1,0 +1,70 @@
+---
+// Hand-drawn SVG butterfly in YZN colours (coral wings, petrol-blue and cream spots).
+// Motion lives in src/scripts/butterfly.ts; the wings flap with CSS.
+const wing = `
+  <path d="M0 -2C8 -34 50 -46 60 -24C66 -9 44 5 0 4Z" fill="#f96450" stroke="#161616" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M6 -6C16 -26 42 -34 50 -22C54 -14 38 -4 6 -2Z" fill="#c4402d"/>
+  <circle cx="44" cy="-24" r="6.5" fill="#f9f0e9" stroke="#161616" stroke-width="1.6"/>
+  <circle cx="28" cy="-14" r="3" fill="#161616"/>
+  <path d="M0 4C30 8 46 24 36 40C28 52 8 38 0 10Z" fill="#22708a" stroke="#161616" stroke-width="2.4" stroke-linejoin="round"/>
+  <circle cx="24" cy="26" r="4.5" fill="#f9f0e9"/>
+  <circle cx="34" cy="34" r="2.2" fill="#f96450"/>
+`;
+---
+
+<div class="butterfly" data-butterfly aria-hidden="true">
+  <svg class="butterfly__svg" viewBox="-70 -60 140 110">
+    <g class="wing wing--r" set:html={wing} />
+    <g class="wing wing--l" set:html={wing} />
+    <ellipse cx="0" cy="4" rx="4" ry="22" fill="#161616"></ellipse>
+    <circle cx="0" cy="-19" r="5" fill="#161616"></circle>
+    <path d="M-1 -22C-6 -36 -12 -40 -16 -42M1 -22C6 -36 12 -40 16 -42" fill="none" stroke="#161616" stroke-width="2" stroke-linecap="round"></path>
+  </svg>
+</div>
+
+<style>
+  .butterfly {
+    --flap: 0.18s;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: calc(var(--z-cursor) - 1);
+    width: 64px;
+    height: 50px;
+    margin: -25px 0 0 -32px;
+    pointer-events: none;
+    will-change: transform;
+    filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.25));
+  }
+
+  .butterfly__svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .wing {
+    transform-box: view-box;
+    transform-origin: 0 0;
+    animation: flap var(--flap) ease-in-out infinite alternate;
+  }
+
+  .wing--l {
+    animation-name: flap-l;
+  }
+
+  .butterfly.is-perched .wing {
+    animation-duration: 1.4s;
+  }
+
+  /* Wings fold toward the body (scaleX squash reads as a flap in 2D) */
+  @keyframes flap {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0.25); }
+  }
+
+  @keyframes flap-l {
+    from { transform: scaleX(-1); }
+    to { transform: scaleX(-0.25); }
+  }
+</style>

@@ -3,14 +3,17 @@ import Loader from './Loader.astro';
 import Header from './Header.astro';
 import Hero from './Hero.astro';
 import Statement from './Statement.astro';
+import Facts from './Facts.astro';
+import Manifesto from './Manifesto.astro';
+import PaperStack from './PaperStack.astro';
 import WorksList from './WorksList.astro';
-import Sticker from './Sticker.astro';
-import Services from './Services.astro';
+import Rings from './Rings.astro';
 import About from './About.astro';
 import Faq from './Faq.astro';
 import Footer from './Footer.astro';
 import Galleries from './Galleries.astro';
 import Fab from './Fab.astro';
+import Butterfly from './Butterfly.astro';
 import type { Lang } from '../i18n/ui';
 
 interface Props {
@@ -29,18 +32,19 @@ const { lang } = Astro.props;
 <main id="main">
   <Hero lang={lang} />
   <Statement lang={lang} />
+  <Facts lang={lang} />
+  <Manifesto lang={lang} />
+  <PaperStack lang={lang} />
   <WorksList lang={lang} />
-  <Sticker lang={lang} />
-  <Services lang={lang} />
+  <Rings lang={lang} />
   <About lang={lang} />
   <Faq lang={lang} />
 </main>
 
 <Footer lang={lang} />
 <Galleries lang={lang} />
-
 <Fab lang={lang} />
-
+<Butterfly />
 
 <script>
   import '../scripts/main';

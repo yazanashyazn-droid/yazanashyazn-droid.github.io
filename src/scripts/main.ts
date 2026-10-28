@@ -2,6 +2,10 @@ import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+import { initPixelFields } from './pixel';
+import { initEyes } from './eyes';
+import { initButterfly } from './butterfly';
+
 gsap.registerPlugin(ScrollTrigger);
 
 const root = document.documentElement;
@@ -100,7 +104,7 @@ if (cursor && finePointer) {
   const yTo = gsap.quickTo(cursor, 'y', { duration: 0.35, ease: 'power3' });
   const interactive = 'a, button, summary, label, [data-cursor-label], input[type="range"]';
   // Surfaces painted in the accent colour, where the coral cursor would disappear
-  const coral = '.footer, .menu, .pill--accent, .row__link, .portrait__paper, .qa[open] .qa__icon, [data-cursor-dark]';
+  const coral = '.footer, .menu, .pill--accent, .row__link, .portrait__paper, .qa[open] .qa__icon, .side-tab, .bar__menu, .eye--a, .sticker--coral, [data-cursor-dark]';
 
   addEventListener('pointermove', (e) => {
     xTo(e.clientX);
@@ -121,31 +125,20 @@ if (cursor && finePointer) {
   });
 }
 
-/* ---------- Loader + hero intro ---------- */
+/* ---------- Loader + bento intro ---------- */
 const loader = $('[data-loader]');
-const heroWords = $$('[data-hero-word]');
-const guides = $$('.guide');
-const heroObjs = $$('[data-hero-obj]');
-const heroFoot = $$('[data-hero-foot]');
+const bento = $$('[data-bento]');
 
 function intro() {
   if (reduced) return;
-  const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
-  tl.from(guides, { scaleX: 0, scaleY: 0, duration: 1.2, stagger: 0.06 }, 0)
-    .from(heroWords, { yPercent: 110, opacity: 0, duration: 1.1, stagger: 0.08 }, 0.15)
-    .from(
-      heroObjs,
-      {
-        x: (i) => (i % 2 ? 1 : -1) * 260,
-        y: (i) => (i < 2 ? -1 : 1) * 220,
-        rotation: (i) => (i % 2 ? 25 : -25),
-        opacity: 0,
-        duration: 1.6,
-        stagger: 0.08,
-      },
-      0.1,
-    )
-    .from(heroFoot, { opacity: 0, y: 20, duration: 0.8 }, 0.8);
+  // Cells wipe open one after another, like tiles flipping on
+  gsap.from(bento, {
+    clipPath: 'inset(100% 0 0 0)',
+    duration: 1.1,
+    ease: 'expo.out',
+    stagger: { each: 0.06, from: 'random' },
+  });
+  gsap.from('.title__h > span', { yPercent: 100, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.08, delay: 0.3 });
 }
 
 function finishLoading() {
@@ -178,48 +171,21 @@ if (loader && !reduced && !sessionStorage.getItem('yzn-seen')) {
   finishLoading();
 }
 
-/* ---------- Hero: mouse parallax + scroll scatter ---------- */
-const hero = $('[data-hero]');
-if (hero && !reduced) {
-  heroObjs.forEach((obj, i) => {
-    const depth = Number(obj.dataset.depth) || 1;
-    const dirX = i % 2 ? 1 : -1;
-    const dirY = i < 2 ? -1 : 1;
-    gsap.to(obj, {
-      x: dirX * 320 * depth,
-      y: dirY * 260 * depth,
-      rotation: dirX * 30 * depth,
-      ease: 'none',
-      scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom bottom', scrub: 0.6 },
-    });
-  });
-
-  gsap.to('[data-hero-title]', {
-    scale: 0.7,
-    opacity: 0,
-    ease: 'power1.in',
-    scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom bottom', scrub: 0.6 },
-  });
-
-  if (finePointer) {
-    const inner = heroObjs.map((obj) => {
-      const img = obj.querySelector('img')!;
-      return {
-        depth: Number(obj.dataset.depth) || 1,
-        x: gsap.quickTo(img, 'x', { duration: 1, ease: 'power3' }),
-        y: gsap.quickTo(img, 'y', { duration: 1, ease: 'power3' }),
-      };
-    });
-    hero.addEventListener('pointermove', (e) => {
-      const nx = e.clientX / innerWidth - 0.5;
-      const ny = e.clientY / innerHeight - 0.5;
-      inner.forEach((o) => {
-        o.x(nx * 50 * o.depth);
-        o.y(ny * 50 * o.depth);
-      });
-    });
-  }
+/* ---------- Live Damascus clock in the header ---------- */
+const clock = $('[data-clock]');
+if (clock) {
+  const fmt = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Damascus' });
+  const tickClock = () => (clock.textContent = fmt.format(new Date()));
+  tickClock();
+  setInterval(tickClock, 20_000);
 }
+
+/* ---------- Pixel fields, eyes, butterfly ---------- */
+initPixelFields(reduced);
+initEyes(reduced);
+initButterfly(reduced);
+
+const hero = $('[data-hero]');
 
 /* ---------- Statement: words light up while scrolling ---------- */
 const statement = $('[data-statement]');
@@ -229,6 +195,65 @@ if (statement && !reduced) {
     stagger: 0.1,
     ease: 'none',
     scrollTrigger: { trigger: statement, start: 'top 80%', end: 'bottom 45%', scrub: true },
+  });
+  gsap.from($$('[data-pill]', statement), {
+    width: 0,
+    borderWidth: 0,
+    ease: 'none',
+    stagger: 0.15,
+    scrollTrigger: { trigger: statement, start: 'top 75%', end: 'center 50%', scrub: true },
+  });
+}
+
+/* ---------- Paper stack: pieces fly in and land like paper ---------- */
+gsap.matchMedia().add('(min-width: 901px) and (prefers-reduced-motion: no-preference)', () => {
+  const stack = $('[data-stack]');
+  if (!stack) return;
+  const pieces = $$('[data-piece]', stack);
+  const tl = gsap.timeline({
+    scrollTrigger: { trigger: stack, start: 'top top', end: 'bottom bottom', scrub: 0.8 },
+  });
+  pieces.forEach((pc, i) => {
+    const sticker = $('[data-sticker]', pc);
+    tl.from(
+      pc,
+      {
+        y: () => innerHeight * 1.1,
+        rotationX: 58,
+        rotationZ: i % 2 ? 18 : -18,
+        skewY: i % 2 ? -6 : 6,
+        duration: 1,
+        ease: 'power3.out',
+      },
+      i * 0.7,
+    );
+    if (sticker) tl.from(sticker, { scale: 0, rotation: -40, duration: 0.35, ease: 'back.out(3)' }, i * 0.7 + 0.75);
+  });
+});
+
+/* ---------- Rings: grow from the bottom into the cream section ---------- */
+gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+  const sec = $('[data-rings]');
+  if (!sec) return;
+  const rings = $$('[data-ring]', sec);
+  // GSAP takes over `transform` and drops the CSS `translate`, so centre the rings here
+  gsap.set(rings, { xPercent: -50, yPercent: -50, scale: 0 });
+  const tl = gsap.timeline({
+    scrollTrigger: { trigger: sec, start: 'top 20%', end: 'bottom bottom', scrub: 0.6 },
+  });
+  tl.to(rings, { scale: 1, ease: 'none', stagger: 0.28, duration: 1 }).from(
+    $('[data-rings-title]', sec),
+    { opacity: 0, y: 60, duration: 0.4 },
+    '-=0.35',
+  );
+});
+
+/* ---------- Bento: columns drift at different speeds while leaving ---------- */
+if (hero && !reduced) {
+  gsap.to($$('[data-area="c1"], [data-area="pxC"], [data-area="c4"]', hero), {
+    yPercent: -18,
+    ease: 'none',
+    scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true },
   });
 }
 
@@ -377,30 +402,21 @@ if (!finePointer && !reduced) {
     },
     { passive: true },
   );
+}
 
-  // Hero desk objects drift on their own, and follow the phone's tilt where allowed
-  const imgs = heroObjs.map((o) => o.querySelector('img')!);
-  imgs.forEach((img, i) => {
-    gsap.to(img, {
-      y: i % 2 ? 14 : -14,
-      rotation: i % 2 ? -3 : 3,
-      duration: 2.6 + i * 0.4,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
+/* ---------- Phones: paper pieces and roles pop in as they arrive ---------- */
+gsap.matchMedia().add('(max-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
+  $$('[data-piece]').forEach((pc, i) => {
+    gsap.from(pc, {
+      y: 80,
+      rotation: i % 2 ? 10 : -10,
+      opacity: 0,
+      duration: 0.9,
+      ease: 'back.out(1.6)',
+      scrollTrigger: { trigger: pc, start: 'top 90%', once: true },
     });
   });
-  const needsPermission =
-    typeof (DeviceOrientationEvent as unknown as { requestPermission?: unknown }).requestPermission === 'function';
-  if (!needsPermission) {
-    const tilt = heroObjs.map((o) => gsap.quickTo(o, 'xPercent', { duration: 1.2, ease: 'power3' }));
-    addEventListener('deviceorientation', (e) => {
-      if (e.gamma == null) return;
-      const g = gsap.utils.clamp(-30, 30, e.gamma) / 30;
-      tilt.forEach((to, i) => to(g * (8 + i * 3)));
-    });
-  }
-}
+});
 
 /* ---------- Mobile works deck: covered cards sink back ---------- */
 gsap.matchMedia().add('(max-width: 767px) and (prefers-reduced-motion: no-preference)', () => {

@@ -1,0 +1,128 @@
+---
+// Three columns: sticky label, tall parallax image, and bracketed fact blocks.
+import { Image } from 'astro:assets';
+import { useT, type Lang } from '../i18n/ui';
+import { img } from '../data/works';
+
+interface Props {
+  lang: Lang;
+}
+const t = useT(Astro.props.lang);
+---
+
+<section class="facts" aria-label={t('about.kicker')}>
+  <div class="facts__side">
+    <div class="facts__sticky">
+      <span class="kicker">{t('about.kicker')}</span>
+      <p>{t('about.role')}</p>
+    </div>
+  </div>
+  <div class="facts__media" data-perch>
+    <div class="facts__frame" data-parallax="-0.12">
+      <Image src={img('works/print/poster.webp')} alt="" widths={[600, 1000]} sizes="(min-width: 900px) 48vw, 100vw" />
+    </div>
+  </div>
+  <div class="facts__col">
+    <article class="fact" data-reveal>
+      <h2 class="fact__big display">{t('facts.years')}</h2>
+      <p class="fact__label">{t('facts.yearsLabel')}</p>
+      <p class="fact__text">{t('facts.yearsText')}</p>
+    </article>
+    <article class="fact" data-reveal>
+      <h2 class="fact__big display">{t('facts.brand')}</h2>
+      <p class="fact__label">{t('facts.brandLabel')}</p>
+      <p class="fact__text">{t('facts.brandText')}</p>
+    </article>
+  </div>
+</section>
+
+<style>
+  .facts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+    background: var(--ink-900);
+    color: var(--paper);
+  }
+
+  .facts__side {
+    border-inline-end: 1px solid rgb(255 255 255 / 0.06);
+  }
+
+  .facts__sticky {
+    position: sticky;
+    top: 56px;
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-8) var(--sp-4);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .facts__media {
+    position: relative;
+    overflow: hidden;
+    min-height: 120vh;
+    background: var(--ink-700);
+  }
+
+  .facts__frame {
+    position: absolute;
+    inset: -10% 0;
+  }
+
+  .facts__frame :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .facts__col {
+    display: grid;
+    align-content: start;
+    background: var(--ink-700);
+  }
+
+  .fact {
+    display: grid;
+    gap: var(--sp-4);
+    padding: var(--sp-12) var(--sp-6);
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  }
+
+  .fact__big {
+    font-size: var(--fs-xl);
+    color: var(--accent);
+  }
+
+  .fact__label {
+    font-family: var(--font-tech);
+    font-size: var(--fs-xs);
+    color: var(--accent-2);
+  }
+
+  .fact__text {
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.8;
+  }
+
+  .fact__text:lang(ar) {
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  @media (max-width: 900px) {
+    .facts {
+      grid-template-columns: 1fr;
+    }
+    .facts__side {
+      display: none;
+    }
+    .facts__media {
+      min-height: 80vh;
+    }
+  }
+</style>

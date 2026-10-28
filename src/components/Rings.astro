@@ -1,0 +1,117 @@
+---
+// Concentric rings ("the bubble") grow from the bottom while scrolling, then the
+// cream ring closes over them and hands over to the cream About section.
+import Title from './Title.astro';
+import { useT, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const t = useT(Astro.props.lang);
+const rings = ['ink', 'coral', 'paper', 'blue', 'soft', 'ink', 'cream'];
+---
+
+<section class="rings" data-rings aria-labelledby="rings-title">
+  <div class="rings__stage">
+    {rings.map((tone, i) => <span class={`ring ring--${tone} ring-${i}`} data-ring aria-hidden="true" />)}
+    <div class="rings__center" data-rings-title>
+      <span class="rings__pills">
+        <span class="rings__pill">{t('rings.kicker')}</span>
+        <span class="rings__pill rings__pill--on">YZN</span>
+      </span>
+      <h2 class="rings__title display" id="rings-title"><Title text={t('rings.title')} /></h2>
+    </div>
+  </div>
+</section>
+
+<style>
+  .rings {
+    position: relative;
+    height: 240vh;
+    background: var(--surface-cream);
+  }
+
+  .rings__stage {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .ring {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    border-radius: 50%;
+    translate: -50% -50%;
+    transform: scale(0);
+  }
+
+  /* Outer → inner; the last (cream) ring ends up covering the viewport */
+  .ring-0 { width: 200vmax; height: 200vmax; }
+  .ring-1 { width: 172vmax; height: 172vmax; }
+  .ring-2 { width: 144vmax; height: 144vmax; }
+  .ring-3 { width: 116vmax; height: 116vmax; }
+  .ring-4 { width: 88vmax; height: 88vmax; }
+  .ring-5 { width: 60vmax; height: 60vmax; }
+  /* Cream grows last and largest, closing over the bands */
+  .ring-6 { width: 240vmax; height: 240vmax; }
+
+  .ring--ink { background: var(--ink-900); }
+  .ring--coral { background: var(--accent); }
+  .ring--paper { background: var(--paper); }
+  .ring--blue { background: var(--sticker); }
+  .ring--soft { background: #fba595; }
+  .ring--cream { background: var(--surface-cream); }
+
+  .rings__center {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: var(--sp-6);
+    text-align: center;
+    color: var(--ink-900);
+  }
+
+  .rings__pills {
+    display: flex;
+    gap: var(--sp-2);
+  }
+
+  .rings__pill {
+    padding: var(--sp-1) var(--sp-4);
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .rings__pill--on {
+    background: var(--accent);
+  }
+
+  .rings__title {
+    font-size: var(--fs-3xl);
+  }
+
+  /* Without JS (or with reduced motion) show the finished state */
+  :global(html:not(.js)) .ring,
+  .rings.is-static .ring {
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rings {
+      height: auto;
+    }
+    .rings__stage {
+      position: relative;
+      height: 60vh;
+    }
+    .ring {
+      transform: none;
+    }
+  }
+</style>

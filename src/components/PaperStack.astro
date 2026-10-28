@@ -1,0 +1,200 @@
+---
+// Pinned "paper stack": work pieces fly in one by one and land like printed paper,
+// each with a sticker. Every piece opens its project gallery.
+import { Image } from 'astro:assets';
+import Title from './Title.astro';
+import { useT, pick, type Lang } from '../i18n/ui';
+import { projects, img } from '../data/works';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const p = (id: string) => projects.find((x) => x.id === id)!;
+
+const pieces = [
+  { src: 'pages/p04.webp', project: 'smash', tone: 'coral' },
+  { src: 'pages/p13.webp', project: 'nawaf', tone: 'paper' },
+  { src: 'works/print/poster.webp', project: 'print', tone: 'blue' },
+  { src: 'pages/p17.webp', project: 'afia', tone: 'ink' },
+  { src: 'works/social/carousel.webp', project: 'social', tone: 'coral' },
+  { src: 'works/3d/nike.webp', project: '3d', tone: 'blue' },
+  { src: 'pages/p25.webp', project: 'print', tone: 'paper' },
+  { src: 'logos/haykal.webp', project: 'logos', tone: 'coral' },
+];
+---
+
+<section class="stack" id="work" data-stack aria-labelledby="stack-title">
+  <div class="stack__stage">
+    <header class="stack__head">
+      <span class="kicker">{t('stack.kicker')}</span>
+      <h2 class="stack__title display" id="stack-title"><Title text={t('stack.title')} /></h2>
+      <p class="stack__hint">{t('stack.hint')}</p>
+    </header>
+
+    {
+      pieces.map((pc, i) => (
+        <a
+          class={`piece pc-${i + 1}`}
+          href={`#work-${pc.project}`}
+          data-gallery-open={pc.project}
+          data-piece
+          data-perch
+          data-cursor-label={t('work.view')}
+        >
+          <span class="piece__paper">
+            <Image src={img(pc.src)} alt={pick(p(pc.project).title, lang)} widths={[480, 960]} sizes="(min-width: 900px) 26vw, 46vw" />
+          </span>
+          <span class={`piece__sticker sticker--${pc.tone}`} data-sticker>
+            {pick(p(pc.project).category, lang)}
+          </span>
+          {i % 3 === 0 && <span class="tape piece__tape" aria-hidden="true" />}
+        </a>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .stack {
+    position: relative;
+    height: 520vh;
+    background-color: var(--surface-cream);
+  }
+
+  .stack__stage {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow: hidden;
+    perspective: 1400px;
+    background:
+      radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.5), transparent 40%),
+      repeating-linear-gradient(115deg, rgb(0 0 0 / 0.018) 0 2px, transparent 2px 9px),
+      var(--surface-cream);
+  }
+
+  .stack__head {
+    position: absolute;
+    top: 80px;
+    inset-inline-end: var(--gutter);
+    z-index: 0;
+    display: grid;
+    gap: var(--sp-3);
+    max-width: 24rem;
+    color: var(--ink-900);
+    text-align: end;
+  }
+
+  .stack__title {
+    font-size: var(--fs-2xl);
+  }
+
+  .stack__hint {
+    font-size: var(--fs-sm);
+    color: var(--text-on-cream-muted);
+  }
+
+  .piece {
+    position: absolute;
+    z-index: 1;
+    display: block;
+    transform-style: preserve-3d;
+    transform-origin: 50% 100%;
+    text-decoration: none;
+    will-change: transform;
+  }
+
+  .piece__paper {
+    display: block;
+    padding: 8px;
+    background: var(--paper);
+    box-shadow:
+      0 30px 50px -20px rgb(0 0 0 / 0.45),
+      0 2px 0 rgb(0 0 0 / 0.06);
+    transition: transform 0.5s var(--ease-spring);
+  }
+
+  .piece:hover .piece__paper {
+    transform: translateY(-8px) rotate(-1deg);
+  }
+
+  .piece__paper :global(img) {
+    width: 100%;
+  }
+
+  .piece__sticker {
+    position: absolute;
+    top: -14px;
+    inset-inline-start: -10px;
+    padding: 4px 12px;
+    font-family: var(--font-display);
+    font-size: clamp(0.9rem, 0.6rem + 0.7vw, 1.3rem);
+    text-transform: uppercase;
+    white-space: nowrap;
+    rotate: -6deg;
+    box-shadow: 0 6px 14px rgb(0 0 0 / 0.25);
+  }
+
+  .piece__sticker:lang(ar) {
+    font-weight: 700;
+  }
+
+  .sticker--coral { background: var(--accent); color: var(--ink-900); }
+  .sticker--blue { background: var(--sticker); color: var(--paper); }
+  .sticker--ink { background: var(--ink-900); color: var(--accent); }
+  .sticker--paper { background: var(--paper); color: var(--ink-900); border: 2px solid var(--ink-900); }
+
+  .piece__tape {
+    top: -12px;
+    inset-inline-end: 12%;
+    rotate: 8deg;
+    background: rgb(255 255 255 / 0.55);
+  }
+
+  /* Collage layout (physical positions, same in both directions) */
+  .pc-1 { left: 4%;  top: 14%; width: 27vw; rotate: -4deg; }
+  .pc-2 { left: 27%; top: 30%; width: 22vw; rotate: 3deg; }
+  .pc-3 { left: 49%; top: 9%;  width: 14vw; rotate: -3deg; }
+  .pc-4 { left: 62%; top: 34%; width: 25vw; rotate: 5deg; }
+  .pc-5 { left: 3%;  top: 56%; width: 24vw; rotate: 3deg; }
+  .pc-6 { left: 46%; top: 50%; width: 14vw; rotate: -7deg; }
+  .pc-7 { left: 74%; top: 60%; width: 22vw; rotate: -3deg; }
+  .pc-8 { left: 29%; top: 66%; width: 11vw; rotate: 9deg; }
+
+  /* Phones: no pinning, a loose two-column collage */
+  @media (max-width: 900px) {
+    .stack {
+      height: auto;
+    }
+    .stack__stage {
+      position: relative;
+      height: auto;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--sp-8) var(--sp-4);
+      padding: 6rem var(--gutter) var(--sp-16);
+      overflow: visible;
+    }
+    .stack__head {
+      position: static;
+      grid-column: 1 / -1;
+      text-align: start;
+      max-width: none;
+      margin-bottom: var(--sp-4);
+    }
+    .piece {
+      position: relative;
+      inset: auto;
+      width: auto;
+    }
+    .pc-3,
+    .pc-6 {
+      margin-top: var(--sp-8);
+    }
+    .piece__sticker {
+      inset-inline-start: 4px;
+    }
+  }
+</style>

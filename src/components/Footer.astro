@@ -20,6 +20,7 @@ const links = [
 ---
 
 <footer class="footer" id="contact" aria-labelledby="footer-title">
+  <div class="footer__px" aria-hidden="true"><canvas data-pixel="cream" data-tile="16"></canvas></div>
   <div class="container">
     <span class="footer__kicker" data-reveal>{t('footer.kicker')}</span>
     <h2 class="footer__title display" id="footer-title" data-reveal>
@@ -42,7 +43,7 @@ const links = [
 
     <div class="footer__cols">
       <div class="footer__col">
-        <h3 class="footer__h">{t('footer.contact')}</h3>
+        <h3 class="footer__h tech">[ {t('footer.contact')} ]</h3>
         <ul>
           <li>
             <span class="footer__label">{t('footer.email')}</span>
@@ -64,7 +65,7 @@ const links = [
         </ul>
       </div>
       <div class="footer__col">
-        <h3 class="footer__h">{t('footer.explore')}</h3>
+        <h3 class="footer__h tech">[ {t('footer.explore')} ]</h3>
         <ul>
           {
             links.map((l) => (
@@ -99,6 +100,21 @@ const links = [
     background: var(--accent);
     color: var(--ink-900);
     overflow: hidden;
+  }
+
+  .footer__px {
+    position: relative;
+    overflow: hidden;
+    height: 96px;
+    margin-top: calc(-1 * clamp(5rem, 10vw, 9rem));
+    margin-bottom: clamp(4rem, 8vw, 7rem);
+  }
+
+  .footer__px canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
   }
 
   .footer__kicker {

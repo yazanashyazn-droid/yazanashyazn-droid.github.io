@@ -1,8 +1,8 @@
 import { gsap } from 'gsap';
 
 // Ring "eyes" whose pupil (the YZN logo dot) follows the pointer, with the odd blink.
-// Hovering an eye floats a soap-bubble lens inside it that reveals hidden work and
-// pops when the pointer leaves (after chandebootcamp.com's "peek" circles).
+// Hovering an eye floats a soap bubble inside it that pops when the pointer leaves
+// (after chandebootcamp.com's "peek" circles).
 export function initEyes(reduced: boolean) {
   const eyes = Array.from(document.querySelectorAll<HTMLElement>('[data-eye]'));
   if (!eyes.length) return;
@@ -60,14 +60,10 @@ export function initEyes(reduced: boolean) {
 
 function initBubble(eye: HTMLElement, touch: boolean) {
   const bubble = eye.querySelector<HTMLElement>('[data-bubble]');
-  const pic = eye.querySelector<HTMLElement>('[data-bubble-img]');
-  if (!bubble || !pic) return;
+  if (!bubble) return;
 
   const bx = gsap.quickTo(bubble, 'x', { duration: 0.6, ease: 'power3' });
   const by = gsap.quickTo(bubble, 'y', { duration: 0.6, ease: 'power3' });
-  // The picture drifts the other way, so the bubble reads as a lens
-  const px = gsap.quickTo(pic, 'x', { duration: 0.6, ease: 'power3' });
-  const py = gsap.quickTo(pic, 'y', { duration: 0.6, ease: 'power3' });
   let open = false;
   let wobble: gsap.core.Tween | null = null;
 
@@ -83,8 +79,6 @@ function initBubble(eye: HTMLElement, touch: boolean) {
     }
     bx(dx);
     by(dy);
-    px(-dx * 0.45);
-    py(-dy * 0.45);
   };
 
   const show = (cx: number, cy: number) => {

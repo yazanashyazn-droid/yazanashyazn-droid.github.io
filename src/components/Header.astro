@@ -29,7 +29,11 @@ const links = [
         <span class="tech" dir="ltr"><span data-clock>--:--</span> GMT+3</span>
       </span>
     </a>
-    <span class="bar__fill" aria-hidden="true"></span>
+    <!-- Fills with scroll position, like the reference's header bar -->
+    <span class="bar__fill" aria-hidden="true">
+      <span class="bar__progress" data-progress></span>
+      <span class="bar__pct tech" data-progress-text>00%</span>
+    </span>
     <a class="bar__tab bar__tab--1" href="#work"><span class="tech">01</span>{t('nav.work')}</a>
     <a class="bar__tab bar__tab--2" href="#about"><span class="tech">02</span>{t('nav.about')}</a>
     <a
@@ -52,6 +56,7 @@ const links = [
       <span class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
       <span class="visually-hidden" data-menu-label>{t('nav.menu')}</span>
     </button>
+    <span class="bar__line" aria-hidden="true" data-progress></span>
   </div>
 
   <nav class="menu" id="site-menu" aria-label={t('nav.main')} data-menu hidden>
@@ -141,7 +146,44 @@ const links = [
   }
 
   .bar__fill {
+    position: relative;
+    overflow: hidden;
     background: var(--ink-900);
+  }
+
+  .bar__progress {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  :global([dir='rtl']) .bar__progress,
+  :global([dir='rtl']) .bar__line {
+    transform-origin: right center;
+  }
+
+  .bar__pct {
+    position: relative;
+    margin-inline-start: auto;
+    padding-inline: var(--sp-3);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--paper);
+    mix-blend-mode: difference;
+  }
+
+  /* Thin progress line under the bar (shown on phones, where the fill cell is hidden) */
+  .bar__line {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+    display: none;
   }
 
   .bar__tab {
@@ -397,6 +439,9 @@ const links = [
     .bar__fill,
     .bar__tab {
       display: none;
+    }
+    .bar__line {
+      display: block;
     }
   }
 

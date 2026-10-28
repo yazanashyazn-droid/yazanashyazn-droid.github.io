@@ -83,6 +83,21 @@ ScrollTrigger.create({
   },
 });
 
+/* ---------- Header progress fill (grows with scroll position) ---------- */
+const progressEls = $$('[data-progress]');
+const progressText = $('[data-progress-text]');
+if (progressEls.length) {
+  const setters = progressEls.map((el) => gsap.quickSetter(el, 'scaleX'));
+  ScrollTrigger.create({
+    start: 0,
+    end: 'max',
+    onUpdate: (self) => {
+      setters.forEach((set) => set(self.progress));
+      if (progressText) progressText.textContent = String(Math.round(self.progress * 100)).padStart(2, '0') + '%';
+    },
+  });
+}
+
 /* ---------- In-page anchors (smooth, menu-aware) ---------- */
 document.addEventListener('click', (e) => {
   const link = (e.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');

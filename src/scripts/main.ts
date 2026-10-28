@@ -4,7 +4,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { initPixelFields } from './pixel';
 import { initEyes } from './eyes';
-import { initButterfly } from './butterfly';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -45,7 +44,9 @@ function setMenu(open: boolean) {
   if (open) {
     menu.hidden = false;
     menu.setAttribute('data-lenis-prevent', '');
-    requestAnimationFrame(() => menu.classList.add('is-open'));
+    // Force a reflow so the transition runs from the closed state (no rAF dependency)
+    void menu.offsetWidth;
+    menu.classList.add('is-open');
     main?.setAttribute('inert', '');
     lenis?.stop();
     header?.classList.remove('is-hidden');
@@ -60,6 +61,10 @@ function setMenu(open: boolean) {
 }
 
 menuBtn?.addEventListener('click', () => setMenu(!menuOpen));
+// Clicking the dimmed page around the panel closes the menu
+menu?.addEventListener('click', (e) => {
+  if (e.target === menu) setMenu(false);
+});
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && menuOpen) {
     setMenu(false);
@@ -104,7 +109,7 @@ if (cursor && finePointer) {
   const yTo = gsap.quickTo(cursor, 'y', { duration: 0.35, ease: 'power3' });
   const interactive = 'a, button, summary, label, [data-cursor-label], input[type="range"]';
   // Surfaces painted in the accent colour, where the coral cursor would disappear
-  const coral = '.footer, .menu, .pill--accent, .row__link, .portrait__paper, .qa[open] .qa__icon, .side-tab, .bar__menu, .eye--a, .sticker--coral, [data-cursor-dark]';
+  const coral = '.footer, .menu__link, .pill--accent, .row__link, .portrait__paper, .qa[open] .qa__icon, .side-tab, .bar__menu, .eye--a, .sticker--coral, [data-cursor-dark]';
 
   addEventListener('pointermove', (e) => {
     xTo(e.clientX);
@@ -180,10 +185,9 @@ if (clock) {
   setInterval(tickClock, 20_000);
 }
 
-/* ---------- Pixel fields, eyes, butterfly ---------- */
+/* ---------- Pixel fields and eyes ---------- */
 initPixelFields(reduced);
 initEyes(reduced);
-initButterfly(reduced);
 
 const hero = $('[data-hero]');
 
@@ -196,12 +200,22 @@ if (statement && !reduced) {
     ease: 'none',
     scrollTrigger: { trigger: statement, start: 'top 80%', end: 'bottom 45%', scrub: true },
   });
+  // Pills keep their size; only their picture opens from the centre (no line re-wrap)
   gsap.from($$('[data-pill]', statement), {
-    width: 0,
-    borderWidth: 0,
+    clipPath: 'inset(0 50% 0 50% round 999px)',
     ease: 'none',
-    stagger: 0.15,
-    scrollTrigger: { trigger: statement, start: 'top 75%', end: 'center 50%', scrub: true },
+    stagger: 0.2,
+    scrollTrigger: { trigger: statement, start: 'top 75%', end: 'center 45%', scrub: true },
+  });
+  // Highlighter sweeps behind each key word; the word turns ink only as the bar covers it
+  const hlTl = gsap.timeline({
+    scrollTrigger: { trigger: statement, start: 'top 60%', end: 'bottom 55%', scrub: true },
+  });
+  $$('[data-hl]', statement).forEach((hl, i) => {
+    const word = hl.nextElementSibling as HTMLElement;
+    hlTl
+      .from(hl, { scaleX: 0, ease: 'none', duration: 1 }, i * 0.6)
+      .fromTo(word, { color: '#f9f0e9' }, { color: '#161616', ease: 'steps(1)', duration: 0.5 }, i * 0.6 + 0.5);
   });
 }
 
@@ -404,7 +418,7 @@ if (!finePointer && !reduced) {
   );
 }
 
-/* ---------- Phones: paper pieces and roles pop in as they arrive ---------- */
+/* ---------- Phones: paper pieces pop in as they arrive ---------- */
 gsap.matchMedia().add('(max-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
   $$('[data-piece]').forEach((pc, i) => {
     gsap.from(pc, {

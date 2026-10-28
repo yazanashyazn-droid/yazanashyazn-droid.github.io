@@ -29,8 +29,8 @@ const cards = [
         <p class="info__date">{t('hero.date')}</p>
         <p class="info__city">{t('about.location')}</p>
         <p class="info__text">{t('hero.info')}</p>
-        <a class="reel" href="#work" data-perch>
-          <Image src={img('works/smash/table.webp')} alt="" widths={[240, 480]} sizes="200px" loading="eager" />
+        <a class="reel" href="#work">
+          <Image src={img('works/smash/table.webp')} alt="" widths={[240, 480]} sizes="200px" quality={88} loading="eager" />
           <span class="reel__label">{t('hero.reel')}</span>
         </a>
       </div>
@@ -50,15 +50,17 @@ const cards = [
           data-gallery-open={p.id}
           data-cursor-label={t('work.view')}
           data-bento
-          data-perch
+         
         >
           <Image
             class="card__img"
             src={img(p.cover)}
             alt=""
-            widths={[360, 720]}
-            sizes="(min-width: 900px) 25vw, 50vw"
+            widths={[480, 800, 1200, 1600]}
+            sizes="(min-width: 900px) 26vw, 50vw"
+            quality={88}
             loading="eager"
+            fetchpriority={i === 0 ? 'high' : 'auto'}
           />
           <span class="card__label">
             <span class="tech">{String(i + 1).padStart(2, '0')}</span>
@@ -215,6 +217,7 @@ const cards = [
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: 50% 30%;
     transition:
       transform 0.8s var(--ease-out),
       filter 0.5s;
@@ -222,6 +225,21 @@ const cards = [
 
   .card:hover .card__img {
     transform: scale(1.06);
+  }
+
+  /* Per-card framing so faces and products sit in view */
+  [data-area='c1'] .card__img { object-position: 50% 12%; }
+  [data-area='c2'] .card__img { object-position: 45% 40%; }
+  [data-area='c3'] .card__img { object-position: 30% 50%; }
+  [data-area='c4'] .card__img { object-position: 55% 25%; }
+
+  /* Soft inner vignette so the label bar and image edges feel printed */
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06), inset 0 -60px 60px -40px rgb(0 0 0 / 0.45);
   }
 
   .card__label {

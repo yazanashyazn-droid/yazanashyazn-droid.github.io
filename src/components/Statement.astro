@@ -1,5 +1,7 @@
 ---
 // Big statement with image "pills" set inside the sentence ({0}, {1}, {2} in the copy).
+// Pills keep a fixed size (only their content is revealed) so lines never re-wrap
+// while scrolling; *starred* words get a coral highlighter that sweeps in.
 import { Image } from 'astro:assets';
 import { useT, type Lang } from '../i18n/ui';
 import { img } from '../data/works';
@@ -13,15 +15,23 @@ const pills = [
   { src: 'logos/haykal.webp', tone: 'blue' },
   { src: 'works/smash/phone.webp', tone: 'paper' },
 ];
-const parts = t('statement2')
+
+type Part = { pill: number } | { word: string; key: boolean };
+let open = false;
+const parts: Part[] = t('statement2')
   .split(/(\{\d\})/)
-  .flatMap((chunk) => {
+  .flatMap((chunk): Part[] => {
     const m = chunk.match(/^\{(\d)\}$/);
     if (m) return [{ pill: Number(m[1]) }];
     return chunk
       .split(/\s+/)
       .filter(Boolean)
-      .map((w) => ({ word: w }));
+      .map((raw) => {
+        const stars = (raw.match(/\*/g) ?? []).length;
+        const key = open || stars > 0;
+        if (stars % 2) open = !open;
+        return { word: raw.replaceAll('*', ''), key };
+      });
   });
 ---
 
@@ -31,13 +41,16 @@ const parts = t('statement2')
       parts.map((p) =>
         'pill' in p ? (
           <>
-            <span class={`pill-media pill-media--${pills[p.pill!].tone}`} aria-hidden="true" data-pill>
-              <Image src={img(pills[p.pill!].src)} alt="" widths={[200, 400]} sizes="160px" />
+            <span class={`pill-media pill-media--${pills[p.pill].tone}`} aria-hidden="true" data-pill>
+              <Image src={img(pills[p.pill].src)} alt="" widths={[200, 400]} sizes="160px" />
             </span>{' '}
           </>
         ) : (
           <>
-            <span class="w">{p.word}</span>{' '}
+            <span class:list={['w', { 'w--key': p.key }]}>
+              {p.key && <span class="hl" aria-hidden="true" data-hl />}
+              <span class="w__t">{p.word}</span>
+            </span>{' '}
           </>
         ),
       )
@@ -57,17 +70,46 @@ const parts = t('statement2')
     max-width: 18ch;
     margin-inline: auto;
     font-size: clamp(2.4rem, 1rem + 5.4vw, 6.4rem);
-    line-height: 1.02;
+    line-height: 1.08;
     text-align: center;
     color: var(--paper);
   }
 
   .statement__text:lang(ar) {
-    line-height: 1.4;
+    line-height: 1.5;
+  }
+
+  .w {
+    position: relative;
+    display: inline-block;
+  }
+
+  .w__t {
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s;
   }
 
   :global(.js) .w {
-    opacity: 0.14;
+    opacity: 0.16;
+  }
+
+  /* Coral highlighter behind key words */
+  .hl {
+    position: absolute;
+    inset: 12% -0.08em 8%;
+    z-index: 0;
+    background: var(--accent);
+    transform-origin: left center;
+    rotate: -1.5deg;
+  }
+
+  :global([dir='rtl']) .hl {
+    transform-origin: right center;
+  }
+
+  .w--key .w__t {
+    color: var(--ink-900);
   }
 
   .pill-media {

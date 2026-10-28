@@ -1,5 +1,6 @@
 ---
 import Logo from './Logo.astro';
+import Torn from './Torn.astro';
 import { useT, contact, type Lang } from '../i18n/ui';
 
 interface Props {
@@ -20,6 +21,7 @@ const links = [
 ---
 
 <footer class="footer" id="contact" aria-labelledby="footer-title">
+  <Torn tone="coral" seed={2} />
   <div class="footer__px" aria-hidden="true"><canvas data-pixel="cream" data-tile="16"></canvas></div>
   <div class="container">
     <span class="footer__kicker" data-reveal>{t('footer.kicker')}</span>
@@ -99,7 +101,7 @@ const links = [
     padding-block: clamp(5rem, 10vw, 9rem) var(--sp-8);
     background: var(--accent);
     color: var(--ink-900);
-    overflow: hidden;
+    overflow-x: clip;
   }
 
   .footer__px {

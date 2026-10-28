@@ -1,8 +1,8 @@
 ---
-// Manifesto, the ring "eyes" (pupil = YZN logo dot) and the roles list.
+// Manifesto and the ring "eyes" (pupil = YZN logo dot) with a peeking bubble.
 import { Image } from 'astro:assets';
-import Title from './Title.astro';
-import { useT, pick, roles, type Lang } from '../i18n/ui';
+import Torn from './Torn.astro';
+import { useT, type Lang } from '../i18n/ui';
 import { img } from '../data/works';
 
 interface Props {
@@ -12,49 +12,47 @@ const { lang } = Astro.props;
 const t = useT(lang);
 // "(words in brackets)" render in the light weight, like the reference
 const chunks = t('manifesto').split(/(\([^)]*\))/).filter(Boolean);
-const eyes = ['eye--a', 'eye--b', 'eye--c'];
+// Each eye hides a piece of work that shows through the soap-bubble lens on hover
+const eyes = [
+  { cls: 'eye--a', peek: 'works/smash/phone.webp' },
+  { cls: 'eye--b', peek: 'logos/haykal.webp' },
+  { cls: 'eye--c', peek: 'works/3d/perfume.webp' },
+];
 ---
 
 <section class="mani" id="services" aria-labelledby="mani-title">
+  <Torn tone="cream" seed={3} />
   <div class="mani__top">
     <h2 class="mani__text display" id="mani-title" data-reveal>
       {chunks.map((c) => (c.startsWith('(') ? <span class="paren">{c}</span> : c))}
     </h2>
     <div class="mani__aside">
-      <div class="mani__thumb" data-perch data-reveal>
+      <div class="mani__thumb" data-reveal>
         <Image src={img('works/nawaf/stationery.webp')} alt="" widths={[300, 600]} sizes="260px" />
       </div>
       <p class="mani__side" data-reveal>{t('manifesto.side')}</p>
     </div>
   </div>
 
-  <div class="eyes" aria-hidden="true">
+  <div class="eyes">
+    <p class="eyes__hint tech">{t('eyes.hint')}</p>
     {
-      eyes.map((cls) => (
-        <div class={`eye ${cls}`} data-eye data-perch>
+      eyes.map((e) => (
+        <div class={`eye ${e.cls}`} data-eye aria-hidden="true">
           <span class="eye__iris">
             <span class="eye__pupil" data-pupil>
               <span class="eye__glint" />
             </span>
+          </span>
+          <span class="bubble" data-bubble>
+            <Image class="bubble__img" src={img(e.peek)} alt="" widths={[300, 600]} sizes="240px" data-bubble-img />
+            <span class="bubble__sheen" />
           </span>
         </div>
       ))
     }
   </div>
 
-  <div class="roles">
-    <p class="roles__text" data-reveal>
-      <span class="kicker">{t('roles.kicker')}</span>
-      {t('roles.text')}
-    </p>
-    <div class="roles__img" data-reveal data-perch>
-      <Image src={img('about/yazan.webp')} alt="" widths={[300, 600]} sizes="240px" />
-    </div>
-    <ul class="roles__list display">
-      {roles.map((r) => <li data-reveal>{pick(r, lang)}</li>)}
-    </ul>
-    <p class="roles__end display" data-reveal><Title text={t('roles.end')} /></p>
-  </div>
 </section>
 
 <style>
@@ -63,7 +61,8 @@ const eyes = ['eye--a', 'eye--b', 'eye--c'];
     padding: clamp(5rem, 10vw, 8rem) var(--gutter);
     background-color: var(--surface-cream);
     color: var(--ink-900);
-    overflow: hidden;
+    /* clip sideways only, so the torn edge can overlap the section above */
+    overflow-x: clip;
   }
 
   .mani__top {
@@ -138,8 +137,67 @@ const eyes = ['eye--a', 'eye--b', 'eye--c'];
     transition: transform 0.6s var(--ease-spring);
   }
 
-  .eye:hover {
-    transform: scale(1.04) rotate(-4deg);
+  .eye {
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .eyes__hint {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+    justify-self: center;
+    font-size: var(--fs-xs);
+    color: var(--text-on-cream-muted);
+    text-align: center;
+  }
+
+  /* Soap-bubble lens that follows the pointer inside an eye and reveals hidden work */
+  .bubble {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    width: 56%;
+    height: 56%;
+    margin: -28% 0 0 -28%;
+    border-radius: 50%;
+    overflow: hidden;
+    pointer-events: none;
+    transform: scale(0);
+    box-shadow:
+      inset 0 0 0 2px rgb(255 255 255 / 0.7),
+      inset -12px -16px 28px rgb(62 154 175 / 0.55),
+      inset 14px 10px 26px rgb(249 100 80 / 0.45),
+      0 18px 30px rgb(0 0 0 / 0.25);
+  }
+
+  .bubble__img {
+    position: absolute;
+    inset: -15%;
+    width: 130%;
+    height: 130%;
+    max-width: none;
+    object-fit: cover;
+    background: var(--paper);
+  }
+
+  /* Iridescent film + highlight */
+  .bubble__sheen {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse 30% 18% at 32% 24%, rgb(255 255 255 / 0.95), transparent 70%),
+      radial-gradient(circle at 70% 78%, rgb(255 255 255 / 0.35), transparent 30%),
+      conic-gradient(
+        from 40deg,
+        rgb(249 100 80 / 0.28),
+        rgb(62 154 175 / 0.3),
+        rgb(249 240 233 / 0.25),
+        rgb(249 100 80 / 0.28)
+      );
+    mix-blend-mode: screen;
   }
 
   .eye__iris {
@@ -178,76 +236,6 @@ const eyes = ['eye--a', 'eye--b', 'eye--c'];
   .eye--c { grid-column: 4; background: var(--ink-900); }
   .eye--c .eye__iris { background: var(--accent-2); }
 
-  /* ---------- Roles ---------- */
-  .roles {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr);
-    grid-template-areas:
-      'text img list'
-      '.    .   end';
-    gap: var(--sp-8);
-    padding-top: var(--sp-12);
-  }
-
-  .roles__text {
-    grid-area: text;
-    display: grid;
-    gap: var(--sp-3);
-    align-content: start;
-    font-size: var(--fs-sm);
-    color: var(--text-on-cream-muted);
-  }
-
-  .roles__img {
-    grid-area: img;
-    aspect-ratio: 3 / 4;
-    overflow: hidden;
-    background: var(--accent);
-    align-self: start;
-  }
-
-  .roles__img :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
-  }
-
-  .roles__list {
-    grid-area: list;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    font-size: clamp(2rem, 1rem + 3vw, 3.6rem);
-    line-height: 1;
-  }
-
-  .roles__list:lang(ar) {
-    line-height: 1.3;
-  }
-
-  .roles__list li {
-    transition:
-      color 0.3s,
-      transform 0.4s var(--ease-out);
-  }
-
-  .roles__list li:hover {
-    color: var(--accent-on-cream);
-    transform: translateX(0.4em);
-  }
-
-  :global([dir='rtl']) .roles__list li:hover {
-    transform: translateX(-0.4em);
-  }
-
-  .roles__end {
-    grid-area: end;
-    justify-self: end;
-    text-align: end;
-    font-size: var(--fs-xl);
-  }
-
   @media (max-width: 900px) {
     .mani__top {
       grid-template-columns: 1fr;
@@ -259,12 +247,10 @@ const eyes = ['eye--a', 'eye--b', 'eye--c'];
     .eye--a { grid-column: 1; }
     .eye--b { grid-column: 2; }
     .eye--c { grid-column: 3; }
-    .roles {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      grid-template-areas:
-        'text img'
-        'list list'
-        'end  end';
+    .eyes__hint {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      margin-top: var(--sp-4);
     }
   }
 </style>

@@ -406,6 +406,20 @@ button {
   pointer-events: none;
 }
 
+/* Droplets from a popped eye bubble */
+.droplet {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-cursor);
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, rgb(62 154 175 / 0.7));
+  pointer-events: none;
+}
+
 /* Floating WhatsApp button, mobile only */
 .fab {
   position: fixed;

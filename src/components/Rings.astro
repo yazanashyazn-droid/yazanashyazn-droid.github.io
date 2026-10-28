@@ -2,6 +2,7 @@
 // Concentric rings ("the bubble") grow from the bottom while scrolling, then the
 // cream ring closes over them and hands over to the cream About section.
 import Title from './Title.astro';
+import Torn from './Torn.astro';
 import { useT, type Lang } from '../i18n/ui';
 
 interface Props {
@@ -12,6 +13,7 @@ const rings = ['ink', 'coral', 'paper', 'blue', 'soft', 'ink', 'cream'];
 ---
 
 <section class="rings" data-rings aria-labelledby="rings-title">
+  <Torn tone="cream" seed={11} />
   <div class="rings__stage">
     {rings.map((tone, i) => <span class={`ring ring--${tone} ring-${i}`} data-ring aria-hidden="true" />)}
     <div class="rings__center" data-rings-title>

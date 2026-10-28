@@ -85,7 +85,7 @@ export const ui = {
     'hero.titleB': 'DESIGN',
     'hero.titleC': 'BY. YAZAN',
     'side.available': 'متاح للعمل',
-    'statement2': 'مهندس معماري {0} ومصمم غرافيك {1} من دمشق. بحوّل الأفكار {2} لهويات بتحكي قصة.',
+    'statement2': '*مهندس معماري* {0} و*مصمم غرافيك* {1} من دمشق. بحوّل الأفكار {2} لهويات *بتحكي قصة.*',
     'facts.years': '05 سنين',
     'facts.yearsLabel': '[ تصميم غرافيك ]',
     'facts.yearsText': 'من 2021 وأنا عم صمم هويات وشعارات ومحتوى رقمي لشركات ومكاتب هندسية ومشاريع شخصية، بروح منفتحة وتفاصيل مدروسة.',
@@ -94,9 +94,7 @@ export const ui = {
     'facts.brandText': 'YZN هو اسمي وتوقيعي. بجمع فيه دقة المهندس المعماري مع خيال المصمم، لأطلع بشغل بيعيش وبيترك أثر.',
     'manifesto': 'وسط (ضجيج الذكاء الاصطناعي) بآمن إنو التصميم مو بس مهنة. هو (أسلوب حياة). وكل مشروع (قصة) لازم تنحكى صح.',
     'manifesto.side': 'ما بصمم شكل وبس. بسمع لكل عميل، وبفهم قصته قبل ما ارسم أول خط.',
-    'roles.kicker': 'شو بشتغل',
-    'roles.text': 'التصميم إلو جذر واحد، وكل دور بلعبه بيضيف زاوية جديدة لمشروعك.',
-    'roles.end': 'كل شي بيبدأ|بشغف',
+    'eyes.hint': '[ مرّر الماوس على العيون ]',
     'stack.kicker': 'من الورق للشاشة',
     'stack.title': 'أعمال بتنحس|قبل ما تنشاف',
     'stack.hint': 'اضغط على أي عمل لتشوف المشروع كامل',
@@ -182,7 +180,7 @@ export const ui = {
     'hero.titleB': 'DESIGN',
     'hero.titleC': 'BY. YAZAN',
     'side.available': 'Available for work',
-    'statement2': 'An architect {0} and graphic designer {1} from Damascus. I turn ideas {2} into identities that tell a story.',
+    'statement2': 'An *architect* {0} and *graphic designer* {1} from Damascus. I turn ideas {2} into identities that *tell a story.*',
     'facts.years': '05 YEARS',
     'facts.yearsLabel': '[ GRAPHIC DESIGN ]',
     'facts.yearsText': 'Since 2021 I have designed identities, logos and digital content for companies, engineering offices and personal brands — openly, and with considered detail.',
@@ -191,9 +189,7 @@ export const ui = {
     'facts.brandText': 'YZN is my name and my signature: an architect’s precision with a designer’s imagination, to make work that lives and leaves a mark.',
     'manifesto': 'Amid the (noise of AI) I believe design is not merely a profession. It is a (way of life). And every project is a (story) worth telling right.',
     'manifesto.side': 'I don’t just design shapes. I listen to every client and understand their story before drawing the first line.',
-    'roles.kicker': 'What I do',
-    'roles.text': 'Design has a common root, and every role I play adds a new angle to your project.',
-    'roles.end': 'All you need|is passion',
+    'eyes.hint': '[ HOVER THE EYES ]',
     'stack.kicker': 'From paper to screen',
     'stack.title': 'Work you feel|before you see',
     'stack.hint': 'Tap any piece to open the full project',
@@ -282,17 +278,6 @@ export const tools = [
   { label: '3ds Max', short: '3', bg: '#1c9c9c', fg: '#ffffff' },
   { label: 'AutoCAD', short: 'A', bg: '#e51050', fg: '#ffffff' },
   { label: 'Revit', short: 'R', bg: '#186bff', fg: '#ffffff' },
-];
-
-export const roles: Bilingual[] = [
-  { ar: 'مهندس معماري', en: 'Architect' },
-  { ar: 'مصمم هويات', en: 'Brand designer' },
-  { ar: 'مصمم شعارات', en: 'Logo designer' },
-  { ar: 'سوشل ميديا', en: 'Social media' },
-  { ar: 'مطبوعات', en: 'Print designer' },
-  { ar: 'مصمم 3D', en: '3D designer' },
-  { ar: 'مونتير', en: 'Video editor' },
-  { ar: 'خطاط حر', en: 'Calligraphy' },
 ];
 
 export const services: { title: Bilingual; text: Bilingual; image: string }[] = [

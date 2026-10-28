@@ -1,6 +1,7 @@
 ---
 import { useT, pick, faq, type Lang } from '../i18n/ui';
 import Title from './Title.astro';
+import Torn from './Torn.astro';
 
 interface Props {
   lang: Lang;
@@ -10,6 +11,7 @@ const t = useT(lang);
 ---
 
 <section class="faq bg-grid-dark" id="faq" aria-labelledby="faq-title">
+  <Torn tone="ink" seed={5} />
   <div class="container faq__grid">
     <header class="faq__head" data-reveal>
       <span class="kicker">{t('faq.kicker')}</span>
@@ -36,6 +38,7 @@ const t = useT(lang);
 
 <style>
   .faq {
+    position: relative;
     padding-block: clamp(5rem, 10vw, 9rem);
   }
 

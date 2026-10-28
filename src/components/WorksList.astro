@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import Torn from './Torn.astro';
 import { useT, pick, type Lang } from '../i18n/ui';
 import { projects, img } from '../data/works';
 import Title from './Title.astro';
@@ -12,6 +13,7 @@ const t = useT(lang);
 ---
 
 <section class="works bg-grid-dark" id="projects" aria-labelledby="work-title">
+  <Torn tone="ink" seed={7} />
   <div class="container">
     <header class="works__head" data-reveal>
       <span class="kicker">{t('work.kicker')}</span>

@@ -1,0 +1,68 @@
+---
+// Torn-paper edge laid over the top of a section, in that section's colour, so it
+// looks like a ripped sheet overlapping the section above. A pale fibre line
+// along the tear sells the paper. The jagged shape is generated at build time.
+interface Props {
+  tone: 'cream' | 'ink' | 'coral';
+  seed?: number;
+}
+const { tone, seed = 1 } = Astro.props;
+
+// Small deterministic PRNG so every build produces the same tear
+let s = seed * 9301 + 49297;
+const rand = () => {
+  s = (s * 9301 + 49297) % 233280;
+  return s / 233280;
+};
+
+const W = 1200;
+const pts: [number, number][] = [];
+for (let x = 0; x <= W; x += 8 + rand() * 18) {
+  const base = 22 + Math.sin(x / 140 + seed) * 7;
+  pts.push([x, base + (rand() - 0.5) * 16]);
+}
+pts.push([W, 22]);
+const edge = pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(' L');
+const shape = `M0 60 L${edge} L${W} 60 Z`;
+const fibre = `M${pts.map(([x, y]) => `${x.toFixed(1)} ${(y + 2.5).toFixed(1)}`).join(' L')}`;
+---
+
+<svg class={`torn torn--${tone}`} viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
+  <path class="torn__shadow" d={shape}></path>
+  <path class="torn__paper" d={shape}></path>
+  <path class="torn__fibre" d={fibre}></path>
+</svg>
+
+<style>
+  .torn {
+    position: absolute;
+    top: -44px;
+    left: 0;
+    z-index: 3;
+    width: 100%;
+    height: 46px;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .torn__shadow {
+    fill: rgb(0 0 0 / 0.28);
+    transform: translateY(-3px);
+    filter: blur(3px);
+  }
+
+  .torn--cream .torn__paper { fill: var(--surface-cream); }
+  .torn--ink .torn__paper { fill: var(--bg); }
+  .torn--coral .torn__paper { fill: var(--accent); }
+
+  .torn__fibre {
+    fill: none;
+    stroke-width: 2.5;
+    vector-effect: non-scaling-stroke;
+    stroke-linejoin: round;
+  }
+
+  .torn--cream .torn__fibre { stroke: rgb(255 255 255 / 0.85); }
+  .torn--ink .torn__fibre { stroke: rgb(255 255 255 / 0.12); }
+  .torn--coral .torn__fibre { stroke: rgb(249 240 233 / 0.55); }
+</style>

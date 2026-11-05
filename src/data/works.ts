@@ -36,6 +36,7 @@ export interface Project {
   title: Bilingual;
   category: Bilingual;
   year: string;
+  /** Shown everywhere outside the gallery, always framed 4:3. New covers go in src/assets/covers/. */
   cover: string;
   summary: Bilingual;
   palette?: string[];
@@ -56,7 +57,7 @@ export const projects: Project[] = [
     title: { ar: 'Smash Burger', en: 'Smash Burger' },
     category: identity,
     year: '2025',
-    cover: 'works/smash/model.webp',
+    cover: 'pages/p04.webp',
     summary: {
       ar: 'تم تطوير الهوية البصرية لعلامة SMASH من خلال عملية تصميم مدروسة بدأت بفهم عميق لرؤية العميل وأهدافه، وانتهت ببناء نظام بصري متكامل يعكس شخصية البراند ويعزز حضوره في السوق.',
       en: 'A complete visual identity for SMASH, built through a careful process that started with the client’s vision and goals and ended in a coherent visual system that expresses the brand and strengthens its market presence.',
@@ -78,7 +79,7 @@ export const projects: Project[] = [
     title: { ar: 'نواف المطيري', en: 'Nawaf Al-Mutairi' },
     category: identity,
     year: '2025',
-    cover: 'works/nawaf/stationery.webp',
+    cover: 'pages/p13.webp',
     summary: {
       ar: 'شعار بأسلوب الخط العربي الحر يعكس الأصالة والهوية الثقافية العربية، مع لمسة عصرية تعزز من حضوره البصري، ويعبّر عن الهيبة والوقار والتميز.',
       en: 'A free-form Arabic calligraphy mark reflecting authenticity and Arab cultural identity, with a contemporary touch that expresses presence, dignity and distinction.',
@@ -97,7 +98,7 @@ export const projects: Project[] = [
     title: { ar: 'مجمع العافية الطبي الخيري', en: 'Al-Afia Medical Complex' },
     category: identity,
     year: '2025',
-    cover: 'works/afia/social.webp',
+    cover: 'pages/p17.webp',
     summary: {
       ar: 'هوية بصرية تعكس رؤية إنسانية متكاملة للرعاية الصحية؛ شعار يجمع بين رمز القلب ورمز اليد في تداخل متناغم يجسّد قيم الرحمة والعطاء ممزوجة بالاحترافية الطبية والموثوقية.',
       en: 'An identity expressing a humane vision of healthcare: a mark that interlocks a heart and a hand, embodying compassion and giving alongside medical professionalism and trust.',
@@ -115,7 +116,7 @@ export const projects: Project[] = [
     title: { ar: 'مجموعة شعارات', en: 'Logo collection' },
     category: { ar: 'شعارات', en: 'Logos' },
     year: '2021 — 2026',
-    cover: 'covers/logos.webp',
+    cover: 'pages/p19.webp',
     summary: {
       ar: 'شعارات لشركات تقنية، مكاتب هندسية، مساجد ومشاريع شخصية — من الأشكال الهندسية الحديثة إلى الخط العربي الحر والكوفي المربع.',
       en: 'Marks for tech companies, engineering offices, mosques and personal brands — from modern geometric forms to free Arabic calligraphy and square Kufic.',
@@ -140,7 +141,7 @@ export const projects: Project[] = [
     title: { ar: 'منشورات وكاروسيل', en: 'Posts & carousels' },
     category: { ar: 'سوشل ميديا', en: 'Social media' },
     year: '2024 — 2026',
-    cover: 'works/social/carousel.webp',
+    cover: 'pages/p22.webp',
     summary: {
       ar: 'تصاميم لجميع منصات التواصل الاجتماعي: منشورات مناسبات، حملات توعوية وتصاميم كاروسيل تحكي قصة الخدمة خطوة بخطوة.',
       en: 'Designs for every social platform: occasion posts, awareness campaigns and carousels that tell a service’s story step by step.',
@@ -158,7 +159,7 @@ export const projects: Project[] = [
     title: { ar: 'منشورات وبروشورات', en: 'Flyers & brochures' },
     category: { ar: 'مطبوعات', en: 'Print' },
     year: '2024 — 2026',
-    cover: 'works/print/poster.webp',
+    cover: 'pages/p25.webp',
     summary: {
       ar: 'منشورات إعلانية تناسب هوية الجهة وتطرح المعلومات بطريقة واضحة، وبروشورات شركات جاهزة للطباعة.',
       en: 'Promotional flyers that fit each client’s identity and present information clearly, plus print-ready company brochures.',
@@ -174,7 +175,7 @@ export const projects: Project[] = [
     title: { ar: 'رندرات منتجات', en: 'Product renders' },
     category: { ar: 'تصاميم 3D', en: '3D design' },
     year: '2025',
-    cover: 'works/3d/nike.webp',
+    cover: 'pages/p27.webp',
     summary: {
       ar: 'نمذجة وإضاءة ورندر منتجات واقعية باستخدام Blender — من النموذج الخام حتى الصورة النهائية.',
       en: 'Modelling, lighting and photoreal product rendering in Blender — from the raw model to the final image.',

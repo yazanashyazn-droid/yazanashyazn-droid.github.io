@@ -29,10 +29,13 @@ const cards = [
         <p class="info__date">{t('hero.date')}</p>
         <p class="info__city">{t('about.location')}</p>
         <p class="info__text">{t('hero.info')}</p>
-        <a class="reel" href="#work">
-          <Image src={img('photos/workspace-wide.webp')} alt="" widths={[240, 480]} sizes="200px" quality={88} loading="eager" />
-          <span class="reel__label">{t('hero.reel')}</span>
-        </a>
+        <button class="reel" type="button" data-reel-open data-cursor-label="▶">
+          <Image src={img('photos/reel-poster.webp')} alt="" widths={[240, 480]} sizes="200px" quality={88} loading="eager" />
+          <span class="reel__play" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 4l14 8-14 8z" fill="currentColor"></path></svg>
+          </span>
+          <span class="reel__label">{t('reel.play')}</span>
+        </button>
       </div>
     </div>
 
@@ -64,7 +67,7 @@ const cards = [
           />
           <span class="card__label">
             <span class="tech">{String(i + 1).padStart(2, '0')}</span>
-            {pick(p.title, lang)}
+            <span class="card__name">{pick(p.title, lang)}</span>
           </span>
         </a>
       ))
@@ -134,8 +137,8 @@ const cards = [
   }
 
   /* Room for the fixed side tab on the right edge */
-  .info,
-  .title {
+  .cell.info,
+  .cell.title {
     padding-right: 60px;
   }
 
@@ -181,7 +184,28 @@ const cards = [
     width: min(100%, 200px);
     aspect-ratio: 16 / 10;
     margin-top: var(--sp-4);
+    padding: 0;
+    border: 0;
     overflow: hidden;
+    background: none;
+  }
+
+  .reel__play {
+    position: absolute;
+    top: 8px;
+    inset-inline-start: 8px;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--ink-900);
+    transition: transform 0.4s var(--ease-spring);
+  }
+
+  .reel:hover .reel__play {
+    transform: scale(1.2);
   }
 
   .reel :global(img) {
@@ -217,7 +241,6 @@ const cards = [
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 30%;
     transition:
       transform 0.8s var(--ease-out),
       filter 0.5s;
@@ -226,12 +249,6 @@ const cards = [
   .card:hover .card__img {
     transform: scale(1.06);
   }
-
-  /* Per-card framing so faces and products sit in view */
-  [data-area='c1'] .card__img { object-position: 50% 12%; }
-  [data-area='c2'] .card__img { object-position: 45% 40%; }
-  [data-area='c3'] .card__img { object-position: 30% 50%; }
-  [data-area='c4'] .card__img { object-position: 55% 25%; }
 
   /* Soft inner vignette so the label bar and image edges feel printed */
   .card::after {
@@ -253,10 +270,14 @@ const cards = [
     font-size: var(--fs-xs);
     font-weight: 700;
     text-transform: uppercase;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     transition: padding 0.4s var(--ease-out);
+  }
+
+  .card__name {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .card:hover .card__label {
@@ -303,8 +324,9 @@ const cards = [
 
   .scroll-more {
     position: absolute;
+    /* Over the title column's pixel cell, clear of the project labels */
     bottom: var(--sp-4);
-    inset-inline-start: 25%;
+    inset-inline-end: var(--sp-4);
     z-index: 2;
     display: inline-flex;
     align-items: center;
@@ -342,15 +364,20 @@ const cards = [
 
   /* Tablet / phone: title first, then a two-column mosaic */
   @media (max-width: 900px) {
+    .cell.info,
+    .cell.title {
+      padding-right: var(--sp-4);
+    }
     .bento {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-template-rows: auto repeat(4, 34vw) auto;
+      grid-template-rows: none;
+      grid-auto-rows: auto;
       grid-template-areas:
         'title title'
-        'c1    pxA'
-        'c1    c2'
-        'pxB   c2'
-        'c3    c4'
+        'c1    c1'
+        'c2    c3'
+        'c4    pxA'
+        'pxB   pxB'
         'info  info';
       height: auto;
       min-height: 0;
@@ -358,6 +385,12 @@ const cards = [
     [data-area='pxC'],
     [data-area='pxD'] {
       display: none;
+    }
+    .card {
+      aspect-ratio: 4 / 3;
+    }
+    [data-area='pxB'] {
+      min-height: 72px;
     }
     .title {
       gap: var(--sp-8);

@@ -1,6 +1,6 @@
 ---
-// Pinned "paper stack": work pieces fly in one by one and land like printed paper,
-// each with a sticker. Every piece opens its project gallery.
+// Pinned "paper stack": one 4:3 cover per project flies in and lands like printed paper.
+// Everything sits in a grid so pieces can never land on top of each other or the title.
 import { Image } from 'astro:assets';
 import Title from './Title.astro';
 import { useT, pick, type Lang } from '../i18n/ui';
@@ -11,18 +11,7 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = useT(lang);
-const p = (id: string) => projects.find((x) => x.id === id)!;
-
-const pieces = [
-  { src: 'pages/p04.webp', project: 'smash', tone: 'coral' },
-  { src: 'pages/p13.webp', project: 'nawaf', tone: 'paper' },
-  { src: 'works/print/poster.webp', project: 'print', tone: 'blue' },
-  { src: 'pages/p17.webp', project: 'afia', tone: 'ink' },
-  { src: 'works/social/carousel.webp', project: 'social', tone: 'coral' },
-  { src: 'works/3d/nike.webp', project: '3d', tone: 'blue' },
-  { src: 'pages/p25.webp', project: 'print', tone: 'paper' },
-  { src: 'logos/haykal.webp', project: 'logos', tone: 'coral' },
-];
+const tones = ['coral', 'paper', 'blue', 'ink', 'coral', 'blue', 'paper'];
 ---
 
 <section class="stack" id="work" data-stack aria-labelledby="stack-title">
@@ -34,22 +23,26 @@ const pieces = [
     </header>
 
     {
-      pieces.map((pc, i) => (
+      projects.map((p, i) => (
         <a
           class={`piece pc-${i + 1}`}
-          href={`#work-${pc.project}`}
-          data-gallery-open={pc.project}
+          href={`#work-${p.id}`}
+          data-gallery-open={p.id}
           data-piece
-         
           data-cursor-label={t('work.view')}
         >
           <span class="piece__paper">
-            <Image src={img(pc.src)} alt={pick(p(pc.project).title, lang)} widths={[480, 960]} sizes="(min-width: 900px) 26vw, 46vw" />
+            <Image
+              class="piece__img"
+              src={img(p.cover)}
+              alt={pick(p.title, lang)}
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 901px) 24vw, (max-width: 600px) 46vw, 40vw"
+            />
           </span>
-          <span class={`piece__sticker sticker--${pc.tone}`} data-sticker>
-            {pick(p(pc.project).category, lang)}
+          <span class={`piece__sticker sticker--${tones[i % tones.length]}`} data-sticker>
+            {pick(p.category, lang)}
           </span>
-          {i % 3 === 0 && <span class="tape piece__tape" aria-hidden="true" />}
         </a>
       ))
     }
@@ -59,14 +52,23 @@ const pieces = [
 <style>
   .stack {
     position: relative;
-    height: 520vh;
+    height: 420vh;
     background-color: var(--surface-cream);
+    overflow-x: clip;
   }
 
   .stack__stage {
     position: sticky;
     top: 0;
     height: 100dvh;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-6) var(--sp-8);
+    align-items: center;
+    justify-items: center;
+    /* 64px on the right keeps the last column clear of the fixed "available" tab */
+    padding: 76px 64px var(--sp-6) var(--gutter);
     overflow: hidden;
     perspective: 1400px;
     background:
@@ -75,38 +77,17 @@ const pieces = [
       var(--surface-cream);
   }
 
-  /* A paper label pinned above the pile, so the pieces slide underneath it */
   .stack__head {
-    position: absolute;
-    top: 84px;
-    /* Physical left in both languages: the pieces are laid out to leave this column free */
-    left: var(--gutter);
-    z-index: 5;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: stretch;
     display: grid;
     gap: var(--sp-3);
-    max-width: 24rem;
-    padding: var(--sp-6) var(--sp-6) var(--sp-4);
-    background: var(--paper);
     color: var(--ink-900);
-    rotate: -1.5deg;
-    box-shadow: 0 24px 40px -18px rgb(0 0 0 / 0.4);
-  }
-
-  .stack__head::before {
-    content: '';
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    width: 110px;
-    height: 28px;
-    translate: -50% 0;
-    rotate: -3deg;
-    background: rgb(255 255 255 / 0.55);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
   }
 
   .stack__title {
-    font-size: var(--fs-2xl);
+    font-size: clamp(2rem, 1rem + 2.6vw, 3.6rem);
   }
 
   .stack__hint {
@@ -114,44 +95,68 @@ const pieces = [
     color: var(--text-on-cream-muted);
   }
 
+  /* Width is also capped by the row height, so short screens never overlap */
   .piece {
-    position: absolute;
+    position: relative;
     z-index: 1;
     display: block;
+    width: min(100%, calc((100dvh - 150px) / 2 * 4 / 3));
     transform-style: preserve-3d;
     transform-origin: 50% 100%;
     text-decoration: none;
     will-change: transform;
   }
 
+  .piece:hover,
+  .piece:focus-visible {
+    z-index: 2;
+  }
+
+  .pc-7 {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .pc-1 { rotate: -2deg; }
+  .pc-2 { rotate: 1.5deg; }
+  .pc-3 { rotate: -1deg; }
+  .pc-4 { rotate: 2deg; }
+  .pc-5 { rotate: -1.5deg; }
+  .pc-6 { rotate: 1deg; }
+  .pc-7 { rotate: -1.5deg; }
+
   .piece__paper {
     display: block;
     padding: 8px;
     background: var(--paper);
     box-shadow:
-      0 30px 50px -20px rgb(0 0 0 / 0.45),
+      0 30px 50px -22px rgb(0 0 0 / 0.45),
       0 2px 0 rgb(0 0 0 / 0.06);
     transition: transform 0.5s var(--ease-spring);
   }
 
   .piece:hover .piece__paper {
-    transform: translateY(-8px) rotate(-1deg);
+    transform: translateY(-6px) rotate(-0.6deg);
   }
 
-  .piece__paper :global(img) {
+  .piece__img {
+    display: block;
     width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: var(--ink-700);
   }
 
   .piece__sticker {
     position: absolute;
-    top: -14px;
-    inset-inline-start: -10px;
-    padding: 4px 12px;
+    top: -12px;
+    inset-inline-start: 10px;
+    padding: 3px 12px;
     font-family: var(--font-display);
-    font-size: clamp(0.9rem, 0.6rem + 0.7vw, 1.3rem);
+    font-size: clamp(0.85rem, 0.6rem + 0.5vw, 1.15rem);
     text-transform: uppercase;
     white-space: nowrap;
-    rotate: -6deg;
+    rotate: -3deg;
     box-shadow: 0 6px 14px rgb(0 0 0 / 0.25);
   }
 
@@ -162,26 +167,9 @@ const pieces = [
   .sticker--coral { background: var(--accent); color: var(--ink-900); }
   .sticker--blue { background: var(--sticker); color: var(--paper); }
   .sticker--ink { background: var(--ink-900); color: var(--accent); }
-  .sticker--paper { background: var(--paper); color: var(--ink-900); border: 2px solid var(--ink-900); }
+  .sticker--paper { background: var(--paper); color: var(--ink-900); box-shadow: 0 0 0 2px var(--ink-900); }
 
-  .piece__tape {
-    top: -12px;
-    inset-inline-end: 12%;
-    rotate: 8deg;
-    background: rgb(255 255 255 / 0.55);
-  }
-
-  /* Collage layout (physical positions, same in both directions) */
-  .pc-1 { left: 31%; top: 12%; width: 23vw; rotate: -4deg; }
-  .pc-2 { left: 49%; top: 38%; width: 20vw; rotate: 3deg; }
-  .pc-3 { left: 56%; top: 7%;  width: 13vw; rotate: -3deg; }
-  .pc-4 { left: 73%; top: 13%; width: 22vw; rotate: 5deg; }
-  .pc-5 { left: 29%; top: 54%; width: 21vw; rotate: 3deg; }
-  .pc-6 { left: 53%; top: 64%; width: 12vw; rotate: -7deg; }
-  .pc-7 { left: 74%; top: 57%; width: 22vw; rotate: -3deg; }
-  .pc-8 { left: 9%;  top: 66%; width: 11vw; rotate: 9deg; }
-
-  /* Phones: no pinning, a loose two-column collage */
+  /* Phones and tablets: no pinning, a tidy two-column pile with the first cover full width */
   @media (max-width: 900px) {
     .stack {
       height: auto;
@@ -189,29 +177,32 @@ const pieces = [
     .stack__stage {
       position: relative;
       height: auto;
-      display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: none;
       gap: var(--sp-8) var(--sp-4);
       padding: 6rem var(--gutter) var(--sp-16);
-      overflow: visible;
+      perspective: none;
     }
     .stack__head {
-      position: static;
       grid-column: 1 / -1;
-      max-width: none;
-      margin-bottom: var(--sp-4);
+      grid-row: auto;
+      margin-bottom: var(--sp-2);
     }
     .piece {
-      position: relative;
-      inset: auto;
-      width: auto;
+      width: 100%;
     }
-    .pc-3,
-    .pc-6 {
-      margin-top: var(--sp-8);
+    .pc-1 {
+      grid-column: 1 / -1;
+    }
+    .pc-7 {
+      grid-column: auto;
+      grid-row: auto;
     }
     .piece__sticker {
-      inset-inline-start: 4px;
+      top: -10px;
+      inset-inline-start: 6px;
+      font-size: 0.8rem;
+      padding: 2px 8px;
     }
   }
 </style>

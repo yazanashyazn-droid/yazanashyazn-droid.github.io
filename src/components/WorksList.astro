@@ -69,8 +69,8 @@ const t = useT(lang);
               data-preview-img={i}
               src={img(p.cover)}
               alt=""
-              widths={[420, 840]}
-              sizes="420px"
+              widths={[480, 960]}
+              sizes="400px"
             />
           ))
         }
@@ -82,6 +82,8 @@ const t = useT(lang);
 <style>
   .works {
     position: relative;
+    /* The tilted mobile deck must not widen the page; the top stays open for the torn edge */
+    overflow-x: clip;
     padding-block: clamp(5rem, 10vw, 9rem);
   }
 
@@ -221,7 +223,7 @@ const t = useT(lang);
 
   .preview__stack {
     display: grid;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 4 / 3;
     overflow: hidden;
     background: var(--ink-700);
   }

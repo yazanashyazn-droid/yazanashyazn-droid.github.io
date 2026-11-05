@@ -14,7 +14,6 @@ export const ui = {
     'loader.label': 'جارٍ التحميل',
     'nav.home': 'الرئيسية',
     'nav.work': 'الأعمال',
-    'nav.services': 'الخدمات',
     'nav.about': 'عني',
     'nav.faq': 'أسئلة شائعة',
     'nav.contact': 'تواصل',
@@ -77,7 +76,7 @@ export const ui = {
     'footer.rights': 'جميع الحقوق محفوظة',
     'footer.top': 'العودة للأعلى',
     'hero.city': 'دمشق',
-    'hero.date': 'متاح لمشاريع 2026',
+    'hero.date': 'متاح لمشاريع جديدة',
     'hero.info': 'مهندس معماري ومصمم غرافيك. هويات بصرية، شعارات، سوشل ميديا، مطبوعات وتصاميم 3D.',
     'hero.reel': 'أعمال مختارة',
     'hero.scrollMore': 'مرّر للمزيد',
@@ -94,6 +93,9 @@ export const ui = {
     'facts.brandText': 'YZN هو اسمي وتوقيعي. بجمع فيه دقة المهندس المعماري مع خيال المصمم، لأطلع بشغل بيعيش وبيترك أثر.',
     'manifesto': 'وسط (ضجيج الذكاء الاصطناعي) بآمن إنو التصميم مو بس مهنة. هو (أسلوب حياة). وكل مشروع (قصة) لازم تنحكى صح.',
     'manifesto.side': 'ما بصمم شكل وبس. بسمع لكل عميل، وبفهم قصته قبل ما ارسم أول خط.',
+    'reel.play': 'شوف الشوريل',
+    'reel.close': 'إغلاق الفيديو',
+    'reel.dismiss': 'إخفاء الفيديو',
     'eyes.hint': '[ مرّر الماوس على العيون ]',
     'stack.kicker': 'من الورق للشاشة',
     'stack.title': 'أعمال بتنحس|قبل ما تنشاف',
@@ -109,7 +111,6 @@ export const ui = {
     'loader.label': 'Loading',
     'nav.home': 'Home',
     'nav.work': 'Work',
-    'nav.services': 'Services',
     'nav.about': 'About',
     'nav.faq': 'FAQ',
     'nav.contact': 'Contact',
@@ -172,7 +173,7 @@ export const ui = {
     'footer.rights': 'All rights reserved',
     'footer.top': 'Back to top',
     'hero.city': 'Damascus',
-    'hero.date': 'Booking 2026 projects',
+    'hero.date': 'Booking new projects',
     'hero.info': 'Architect and graphic designer. Visual identities, logos, social media, print and 3D.',
     'hero.reel': 'Selected work',
     'hero.scrollMore': 'Scroll more',
@@ -189,6 +190,9 @@ export const ui = {
     'facts.brandText': 'YZN is my name and my signature: an architect’s precision with a designer’s imagination, to make work that lives and leaves a mark.',
     'manifesto': 'Amid the (noise of AI) I believe design is not merely a profession. It is a (way of life). And every project is a (story) worth telling right.',
     'manifesto.side': 'I don’t just design shapes. I listen to every client and understand their story before drawing the first line.',
+    'reel.play': 'Watch the showreel',
+    'reel.close': 'Close video',
+    'reel.dismiss': 'Hide video',
     'eyes.hint': '[ HOVER THE EYES ]',
     'stack.kicker': 'From paper to screen',
     'stack.title': 'Work you feel|before you see',
@@ -278,57 +282,6 @@ export const tools = [
   { label: '3ds Max', short: '3', bg: '#1c9c9c', fg: '#ffffff' },
   { label: 'AutoCAD', short: 'A', bg: '#e51050', fg: '#ffffff' },
   { label: 'Revit', short: 'R', bg: '#186bff', fg: '#ffffff' },
-];
-
-export const services: { title: Bilingual; text: Bilingual; image: string }[] = [
-  {
-    title: { ar: 'هويات بصرية', en: 'Visual identity' },
-    text: {
-      ar: 'نظام بصري متكامل: شعار، ألوان، خطوط وتطبيقات.',
-      en: 'A complete visual system: logo, colour, type and applications.',
-    },
-    image: 'works/smash/phone.webp',
-  },
-  {
-    title: { ar: 'تصميم شعارات', en: 'Logo design' },
-    text: {
-      ar: 'شعارات عصرية وخط عربي حر يعبّر عن شخصية العلامة.',
-      en: 'Modern marks and free Arabic calligraphy that carry a brand’s character.',
-    },
-    image: 'logos/haykal.webp',
-  },
-  {
-    title: { ar: 'سوشل ميديا', en: 'Social media' },
-    text: {
-      ar: 'منشورات وكاروسيل ومحتوى رقمي متناسق مع الهوية.',
-      en: 'Posts, carousels and digital content consistent with the identity.',
-    },
-    image: 'works/social/post-3.webp',
-  },
-  {
-    title: { ar: 'مطبوعات', en: 'Print' },
-    text: {
-      ar: 'بروشورات ومنشورات وتجهيز معارض جاهز للطباعة.',
-      en: 'Brochures, flyers and exhibition material, ready for print.',
-    },
-    image: 'works/print/poster.webp',
-  },
-  {
-    title: { ar: 'تصاميم 3D', en: '3D design' },
-    text: {
-      ar: 'نمذجة ورندر منتجات واقعية باستخدام Blender.',
-      en: 'Product modelling and photoreal rendering in Blender.',
-    },
-    image: 'works/3d/perfume.webp',
-  },
-  {
-    title: { ar: 'تصميم معماري', en: 'Architecture' },
-    text: {
-      ar: 'تصاميم هندسية وداخلية ثنائية وثلاثية الأبعاد.',
-      en: 'Architectural and interior design in 2D and 3D.',
-    },
-    image: 'hero/laptop.webp',
-  },
 ];
 
 // Draft answers — Yazan to review and adjust.

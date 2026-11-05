@@ -1,0 +1,214 @@
+---
+// Showreel: a small silent player in the corner after the hero (a round play button on
+// phones) and a full lightbox with sound. Video only downloads once it is needed.
+import { Image } from 'astro:assets';
+import { useT, type Lang } from '../i18n/ui';
+import poster from '../assets/photos/reel-poster.webp';
+
+interface Props {
+  lang: Lang;
+}
+const t = useT(Astro.props.lang);
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+
+<aside class="mini" data-reel-mini aria-label={t('reel.play')}>
+  <button class="mini__open" type="button" data-reel-open data-cursor-label="▶" aria-label={t('reel.play')}>
+    <Image class="mini__poster" src={poster} alt="" widths={[320, 640]} sizes="280px" />
+    <video
+      class="mini__video"
+      data-reel-mini-video
+      data-src={`${base}video/showreel-mini.mp4`}
+      muted
+      loop
+      playsinline
+      preload="none"
+      aria-hidden="true"></video>
+    <span class="mini__play" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 4l14 8-14 8z" fill="currentColor"></path></svg>
+    </span>
+    <span class="mini__label">{t('reel.play')}</span>
+  </button>
+  <button class="mini__x" type="button" data-reel-dismiss aria-label={t('reel.dismiss')}>
+    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+      <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4"></path>
+    </svg>
+  </button>
+</aside>
+
+<dialog class="lightbox" data-reel-dialog aria-label={t('reel.play')}>
+  <form method="dialog">
+    <button class="pill pill--accent lightbox__close" type="submit" aria-label={t('reel.close')}>
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2"></path>
+      </svg>
+      {t('reel.close')}
+    </button>
+  </form>
+  <video
+    class="lightbox__video"
+    data-reel-video
+    data-src-wide={`${base}video/showreel.mp4`}
+    data-src-tall={`${base}video/showreel-vertical.mp4`}
+    controls
+    playsinline
+    preload="none"></video>
+</dialog>
+
+<style>
+  /* Corner player, opposite the fixed "available" tab */
+  .mini {
+    position: fixed;
+    bottom: var(--sp-6);
+    left: var(--sp-6);
+    z-index: 80;
+    width: 240px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(24px) rotate(-1.5deg);
+    transition:
+      opacity 0.4s var(--ease-out),
+      transform 0.5s var(--ease-spring),
+      visibility 0.4s;
+  }
+
+  .mini.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: rotate(-1.5deg);
+  }
+
+  .mini__open {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    padding: 0;
+    border: 6px solid var(--paper);
+    overflow: hidden;
+    background: var(--ink-900);
+    box-shadow: 0 22px 40px -14px rgb(0 0 0 / 0.6);
+  }
+
+  .mini__poster,
+  .mini__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mini__play {
+    position: absolute;
+    bottom: 8px;
+    inset-inline-start: 8px;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--ink-900);
+    transition: transform 0.4s var(--ease-spring);
+  }
+
+  .mini__open:hover .mini__play {
+    transform: scale(1.25);
+  }
+
+  .mini__label {
+    position: absolute;
+    bottom: 12px;
+    inset-inline-start: 48px;
+    padding: 1px 8px;
+    background: var(--paper);
+    color: var(--ink-900);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+  }
+
+  .mini__x {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--ink-900);
+    color: var(--paper);
+  }
+
+  /* Phones: just a round play button beside the WhatsApp one */
+  @media (max-width: 767px) {
+    .mini {
+      bottom: max(1rem, env(safe-area-inset-bottom));
+      left: auto;
+      inset-inline-start: 1rem;
+      width: 52px;
+      transform: translateY(24px);
+    }
+    .mini.is-visible {
+      transform: none;
+    }
+    .mini__open {
+      aspect-ratio: 1;
+      border-width: 3px;
+      border-radius: 50%;
+    }
+    .mini__video,
+    .mini__label,
+    .mini__x {
+      display: none;
+    }
+    .mini__play {
+      inset: 0;
+      margin: auto;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .lightbox {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: var(--sp-4);
+    border: 0;
+    background: rgb(22 22 22 / 0.96);
+    color: var(--text);
+  }
+
+  .lightbox[open] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-4);
+    animation: lightbox-in 0.4s var(--ease-out);
+  }
+
+  @keyframes lightbox-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .lightbox form {
+    position: absolute;
+    top: var(--sp-4);
+    inset-inline-end: var(--sp-4);
+    z-index: 1;
+  }
+
+  .lightbox__video {
+    max-width: min(100%, 1280px);
+    max-height: 100%;
+    background: #000;
+  }
+</style>

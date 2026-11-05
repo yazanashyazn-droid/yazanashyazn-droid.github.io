@@ -277,15 +277,6 @@ gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
   );
 });
 
-/* ---------- Bento: columns drift at different speeds while leaving ---------- */
-if (hero && !reduced) {
-  gsap.to($$('[data-area="c1"], [data-area="pxC"], [data-area="c4"]', hero), {
-    yPercent: -18,
-    ease: 'none',
-    scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true },
-  });
-}
-
 /* ---------- Generic reveals + parallax ---------- */
 if (!reduced) {
   ScrollTrigger.batch('[data-reveal]', {
@@ -460,6 +451,77 @@ gsap.matchMedia().add('(max-width: 767px) and (prefers-reduced-motion: no-prefer
   });
 });
 
+/* ---------- Showreel: corner player + lightbox ---------- */
+const reelDialog = $<HTMLDialogElement>('[data-reel-dialog]');
+const reelVideo = $<HTMLVideoElement>('[data-reel-video]');
+const reelMini = $('[data-reel-mini]');
+const reelMiniVideo = $<HTMLVideoElement>('[data-reel-mini-video]');
+const DISMISS_KEY = 'yzn-reel-dismissed';
+let reelDismissed = false;
+try {
+  reelDismissed = sessionStorage.getItem(DISMISS_KEY) === '1';
+} catch {
+  /* storage blocked: the player just shows again */
+}
+
+document.addEventListener('click', (e) => {
+  if (!(e.target as Element).closest('[data-reel-open]') || !reelDialog || !reelVideo) return;
+  // Vertical cut on portrait phones, 16:9 everywhere else
+  const src = matchMedia('(max-width: 767px) and (orientation: portrait)').matches
+    ? reelVideo.dataset.srcTall!
+    : reelVideo.dataset.srcWide!;
+  if (reelVideo.getAttribute('src') !== src) reelVideo.src = src;
+  reelMiniVideo?.pause();
+  reelDialog.showModal();
+  if (cursor) reelDialog.append(cursor);
+  lenis?.stop();
+  void reelVideo.play().catch(() => {
+    /* autoplay refused: the visible controls still work */
+  });
+});
+reelDialog?.addEventListener('close', () => {
+  reelVideo?.pause();
+  if (cursor) document.body.prepend(cursor);
+  lenis?.start();
+  if (reelMini?.classList.contains('is-visible')) void reelMiniVideo?.play().catch(() => {});
+});
+$('[data-reel-dismiss]')?.addEventListener('click', () => {
+  reelDismissed = true;
+  reelMini?.classList.remove('is-visible');
+  reelMiniVideo?.pause();
+  try {
+    sessionStorage.setItem(DISMISS_KEY, '1');
+  } catch {
+    /* not remembered this time */
+  }
+});
+
+// The corner player steps aside while the work grid fills the screen on desktop
+function reelBlocked() {
+  if (innerWidth <= 900) return false;
+  const r = $('[data-stack]')?.getBoundingClientRect();
+  return !!r && r.top < innerHeight * 0.6 && r.bottom > innerHeight * 0.4;
+}
+
+function updateReelMini(heroEl: Element | null, footerEl: Element | null) {
+  if (!reelMini || !heroEl || !footerEl) return;
+  const show =
+    !reelDismissed &&
+    heroEl.getBoundingClientRect().bottom < innerHeight * 0.5 &&
+    footerEl.getBoundingClientRect().top > innerHeight &&
+    !reelBlocked();
+  if (show === reelMini.classList.contains('is-visible')) return;
+  reelMini.classList.toggle('is-visible', show);
+  if (!reelMiniVideo || reduced || !finePointer) return;
+  if (show) {
+    // The silent loop only downloads once the player actually appears
+    if (!reelMiniVideo.src) reelMiniVideo.src = reelMiniVideo.dataset.src!;
+    void reelMiniVideo.play().catch(() => {});
+  } else {
+    reelMiniVideo.pause();
+  }
+}
+
 /* ---------- Floating WhatsApp button (mobile) ---------- */
 const fab = $('[data-fab]');
 const footer = $('#contact');
@@ -468,6 +530,7 @@ if (fab && hero && footer) {
     const pastHero = hero.getBoundingClientRect().bottom < innerHeight * 0.5;
     const atFooter = footer.getBoundingClientRect().top < innerHeight;
     fab.classList.toggle('is-visible', pastHero && !atFooter);
+    updateReelMini(hero, footer);
   };
   ScrollTrigger.create({ start: 0, end: 'max', onUpdate: update });
   update();

@@ -13,6 +13,7 @@ import Faq from './Faq.astro';
 import Footer from './Footer.astro';
 import Galleries from './Galleries.astro';
 import Fab from './Fab.astro';
+import Showreel from './Showreel.astro';
 import type { Lang } from '../i18n/ui';
 
 interface Props {
@@ -43,6 +44,7 @@ const { lang } = Astro.props;
 <Footer lang={lang} />
 <Galleries lang={lang} />
 <Fab lang={lang} />
+<Showreel lang={lang} />
 
 <script>
   import '../scripts/main';

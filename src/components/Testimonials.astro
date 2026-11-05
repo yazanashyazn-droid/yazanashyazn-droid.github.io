@@ -1,0 +1,96 @@
+---
+// Client words. Renders nothing until `testimonials` in data/stories.ts has real quotes.
+import Title from './Title.astro';
+import { useT, pick, type Lang } from '../i18n/ui';
+import { testimonials } from '../data/stories';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+
+{
+  testimonials.length > 0 && (
+    <section class="said bg-grid-cream" aria-labelledby="said-title">
+      <div class="container">
+        <header class="said__head" data-reveal>
+          <span class="kicker">{t('said.kicker')}</span>
+          <h2 class="said__title display" id="said-title">
+            <Title text={t('said.title')} />
+          </h2>
+        </header>
+        <ul class="said__list">
+          {testimonials.map((q) => (
+            <li class="quote paper" data-reveal>
+              <span class="tape quote__tape" aria-hidden="true" />
+              <blockquote>{pick(q.quote, lang)}</blockquote>
+              <p class="quote__who">
+                <strong>{pick(q.name, lang)}</strong>
+                <span>{pick(q.role, lang)}</span>
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .said {
+    padding-block: clamp(3rem, 7vw, 6rem) 0;
+    color: var(--ink-900);
+  }
+
+  .said__head {
+    display: grid;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-8);
+  }
+
+  .said__title {
+    font-size: var(--fs-3xl);
+  }
+
+  .said__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: var(--sp-8) var(--sp-6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .quote {
+    position: relative;
+    padding: var(--sp-8) var(--sp-6) var(--sp-6);
+    rotate: -1deg;
+  }
+
+  .quote:nth-child(even) {
+    rotate: 1deg;
+  }
+
+  .quote__tape {
+    top: -14px;
+    left: 50%;
+    translate: -50% 0;
+  }
+
+  blockquote {
+    margin: 0 0 var(--sp-4);
+    font-size: var(--fs-md);
+  }
+
+  .quote__who {
+    display: grid;
+    margin: 0;
+    font-size: var(--fs-sm);
+  }
+
+  .quote__who span {
+    color: var(--text-on-cream-muted);
+  }
+</style>

@@ -5,6 +5,9 @@ import { Image } from 'astro:assets';
 import { useT, pick, type Lang } from '../i18n/ui';
 import { projects, img } from '../data/works';
 import SocialPhone from './SocialPhone.astro';
+import ModelViewer from './ModelViewer.astro';
+import CaseStudy from './CaseStudy.astro';
+import { stories } from '../data/stories';
 
 interface Props {
   lang: Lang;
@@ -62,13 +65,16 @@ const t = useT(lang);
             )}
           </header>
 
+          {!(p.feed || p.models) && stories[p.id] && <CaseStudy lang={lang} story={stories[p.id]} />}
+
           {/* Inert until opened: images inside a <template> are never fetched up front */}
           <template data-gallery-items>
+          {p.models && <ModelViewer lang={lang} models={p.models} />}
           {p.feed ? <SocialPhone lang={lang} feed={p.feed} /> : (
           <ul class="gallery__grid">
             {p.items.map((item) => (
               <li class:list={['card', { 'card--wide': item.wide }]}>
-                <figure class="paper">
+                                <figure class="paper">
                   <span class="tape card__tape" aria-hidden="true" />
                   {item.before ? (
                     <div class="compare" data-compare>
@@ -97,6 +103,8 @@ const t = useT(lang);
           </ul>
           )}
           </template>
+
+          {(p.feed || p.models) && stories[p.id] && <CaseStudy lang={lang} story={stories[p.id]} />}
 
           <nav class="gallery__nav" aria-label={t('work.more')}>
             <a href={`#work-${prev.id}`} data-gallery-open={prev.id} class="gallery__nav-link">

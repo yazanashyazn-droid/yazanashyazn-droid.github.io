@@ -1,0 +1,157 @@
+---
+// Case study inside a project's gallery: brief, idea, result and process steps.
+// A step's sketch appears by itself once its file exists in src/assets/sketches/.
+import { Image } from 'astro:assets';
+import { useT, pick, type Lang } from '../i18n/ui';
+import { img, hasImg } from '../data/works';
+import type { Story } from '../data/stories';
+
+interface Props {
+  lang: Lang;
+  story: Story;
+}
+const { lang, story } = Astro.props;
+const t = useT(lang);
+const blocks = [
+  { label: t('story.brief'), text: pick(story.brief, lang) },
+  { label: t('story.idea'), text: pick(story.idea, lang) },
+  { label: t('story.result'), text: pick(story.result, lang) },
+];
+---
+
+<section class="story">
+  <div class="story__blocks">
+    {
+      blocks.map((b, i) => (
+        <div class="block">
+          <span class="block__num tech" aria-hidden="true">0{i + 1}</span>
+          <h3 class="block__label">{b.label}</h3>
+          <p>{b.text}</p>
+        </div>
+      ))
+    }
+  </div>
+
+  <h3 class="story__steps-title">{t('story.process')}</h3>
+  <ol class="steps">
+    {
+      story.steps.map((s) => (
+        <li class="step">
+          {s.sketch && hasImg(s.sketch) && (
+            <figure class="step__sketch">
+              <Image src={img(s.sketch)} alt={pick(s.title, lang)} widths={[480, 960]} sizes="(min-width: 800px) 30vw, 90vw" loading="lazy" />
+              <figcaption>{t('story.sketchNote')}</figcaption>
+            </figure>
+          )}
+          <h4 class="step__title">{pick(s.title, lang)}</h4>
+          <p>{pick(s.text, lang)}</p>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .story {
+    display: grid;
+    gap: var(--sp-8);
+    margin-bottom: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .story__blocks {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .block {
+    position: relative;
+    padding: var(--sp-6);
+    background: var(--paper);
+    color: var(--ink-900);
+  }
+
+  .block:nth-child(3) {
+    background: var(--accent);
+  }
+
+  .block__num {
+    display: block;
+    margin-bottom: var(--sp-3);
+    font-size: var(--fs-xs);
+  }
+
+  .block__label {
+    margin: 0 0 var(--sp-2);
+    font-size: var(--fs-md);
+    font-weight: 700;
+  }
+
+  .block p {
+    margin: 0;
+    font-size: var(--fs-sm);
+  }
+
+  .story__steps-title {
+    margin: 0 0 calc(-1 * var(--sp-4));
+    font-size: var(--fs-md);
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .steps {
+    display: grid;
+    gap: var(--sp-6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: step;
+  }
+
+  .step {
+    counter-increment: step;
+    padding-top: var(--sp-3);
+    border-top: 1px solid rgb(255 255 255 / 0.22);
+  }
+
+  .step__title {
+    margin: 0 0 var(--sp-1);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+  }
+
+  .step__title::before {
+    content: counter(step) '. ';
+    color: var(--accent);
+  }
+
+  .step p {
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+  }
+
+  .step__sketch {
+    margin: 0 0 var(--sp-3);
+  }
+
+  .step__sketch :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: var(--paper);
+  }
+
+  .step__sketch figcaption {
+    margin-top: var(--sp-1);
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 800px) {
+    .story__blocks,
+    .steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

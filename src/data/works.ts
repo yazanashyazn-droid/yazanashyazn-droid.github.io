@@ -14,6 +14,8 @@ const files = import.meta.glob<{ default: ImageMetadata }>('../assets/**/*.{webp
   eager: true,
 });
 
+export const hasImg = (path: string) => Boolean(files[`../assets/${path}`]);
+
 export function img(path: string): ImageMetadata {
   const mod = files[`../assets/${path}`];
   if (!mod) throw new Error(`Missing image: src/assets/${path}`);
@@ -29,6 +31,27 @@ export interface WorkItem {
   before?: string;
   /** Wide items span the full gallery width. */
   wide?: boolean;
+}
+
+export interface ModelVariant {
+  name: Bilingual;
+  /** Colour of the swatch button */
+  swatch: string;
+  /** Material name in the GLB -> linear RGB */
+  colors: Record<string, [number, number, number]>;
+  /** Rotates the hue of image textures, in degrees (for label colourways) */
+  hue?: number;
+}
+
+export interface ModelItem {
+  /** Path under public/, e.g. models/tripod.glb */
+  src: string;
+  title: Bilingual;
+  variants?: ModelVariant[];
+  /** Parts spread out along this axis in the exploded view; without it they spread from the centre. */
+  explodeAxis?: [number, number, number];
+  /** Total width of that spread, where the model's largest side is 1. */
+  explodeSpread?: number;
 }
 
 export interface FeedPost {
@@ -50,6 +73,8 @@ export interface Project {
   summary: Bilingual;
   palette?: string[];
   items: WorkItem[];
+  /** Interactive 3D stage with X-ray view, shown above the gallery grid. */
+  models?: ModelItem[];
   /** Replaces the gallery grid with the Instagram phone mockup. */
   feed?: FeedPost[];
 }
@@ -221,6 +246,59 @@ export const projects: Project[] = [
   },
   {
     id: '3d',
+    models: [
+      {
+        src: 'models/tripod.glb',
+        title: { ar: 'حامل كاميرا', en: 'Camera tripod' },
+        variants: [
+          { name: { ar: 'أحمر', en: 'Red' }, swatch: '#c8222a', colors: { plastic_01: [0.552, 0.017, 0.02] } },
+          { name: { ar: 'كورال', en: 'Coral' }, swatch: '#f96450', colors: { plastic_01: [0.95, 0.13, 0.08] } },
+          { name: { ar: 'بترولي', en: 'Petrol' }, swatch: '#22708a', colors: { plastic_01: [0.016, 0.16, 0.25] } },
+          { name: { ar: 'ذهبي', en: 'Gold' }, swatch: '#d9a441', colors: { plastic_01: [0.69, 0.37, 0.05] } },
+        ],
+      },
+      {
+        src: 'models/iphone.glb',
+        title: { ar: 'iPhone Air', en: 'iPhone Air' },
+        explodeAxis: [1, 0, 0],
+        explodeSpread: 1.7,
+        variants: [
+          {
+            name: { ar: 'أزرق فاتح', en: 'Sky Blue' },
+            swatch: '#bcd3ea',
+            colors: { anodized_alu_03: [0.7, 0.81, 0.92], car_metallic_paint_01: [0.62, 0.76, 0.9] },
+          },
+          {
+            name: { ar: 'ذهبي فاتح', en: 'Light Gold' },
+            swatch: '#ecdcc0',
+            colors: { anodized_alu_03: [0.92, 0.82, 0.66], car_metallic_paint_01: [0.86, 0.74, 0.56] },
+          },
+          {
+            name: { ar: 'أبيض', en: 'Cloud White' },
+            swatch: '#f2f1ec',
+            colors: { anodized_alu_03: [0.93, 0.93, 0.92], car_metallic_paint_01: [0.88, 0.88, 0.85] },
+          },
+          {
+            name: { ar: 'أسود', en: 'Space Black' },
+            swatch: '#26262a',
+            colors: { anodized_alu_03: [0.03, 0.03, 0.035], car_metallic_paint_01: [0.02, 0.02, 0.024] },
+          },
+        ],
+      },
+      {
+        src: 'models/prime.glb',
+        title: { ar: 'عبوة Prime', en: 'Prime bottle' },
+        explodeAxis: [1, 0, 0],
+        explodeSpread: 1.5,
+        variants: [
+          { name: { ar: 'أحمر', en: 'Red' }, swatch: '#d9213a', hue: 0, colors: { 'Material.002': [0.62, 0.01, 0.02] } },
+          { name: { ar: 'أزرق', en: 'Blue' }, swatch: '#1f6fe0', hue: 225, colors: { 'Material.002': [0.01, 0.1, 0.7] } },
+          { name: { ar: 'أخضر', en: 'Green' }, swatch: '#3fae3a', hue: 115, colors: { 'Material.002': [0.06, 0.42, 0.03] } },
+          { name: { ar: 'برتقالي', en: 'Orange' }, swatch: '#f47a1f', hue: 28, colors: { 'Material.002': [0.9, 0.2, 0.01] } },
+          { name: { ar: 'بنفسجي', en: 'Purple' }, swatch: '#8a3fd1', hue: 285, colors: { 'Material.002': [0.25, 0.03, 0.62] } },
+        ],
+      },
+    ],
     title: { ar: 'رندرات منتجات', en: 'Product renders' },
     category: { ar: 'تصاميم 3D', en: '3D design' },
     year: '2025',

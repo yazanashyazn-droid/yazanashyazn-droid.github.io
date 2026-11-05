@@ -1,0 +1,212 @@
+---
+// "Start a project": the visitor picks a few options, then WhatsApp opens with a tidy message.
+// Nothing is stored or sent by the site itself. Logic lives in scripts/brief.ts.
+import Title from './Title.astro';
+import { useT, contact, briefOptions, pick, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const groups = [
+  { name: 'type', label: t('brief.type'), options: briefOptions.type, required: true },
+  { name: 'budget', label: t('brief.budget'), options: briefOptions.budget, required: false },
+  { name: 'time', label: t('brief.time'), options: briefOptions.time, required: false },
+];
+---
+
+<section class="brief bg-grid-cream" id="brief" aria-labelledby="brief-title">
+  <div class="container brief__grid">
+    <header class="brief__head" data-reveal>
+      <span class="kicker">{t('brief.kicker')}</span>
+      <h2 class="brief__title display" id="brief-title"><Title text={t('brief.title')} /></h2>
+      <p>{t('brief.text')}</p>
+    </header>
+
+    <form
+      class="form"
+      data-brief
+      data-reveal
+      data-phone={contact.phone}
+      data-hello={t('brief.msg.hello')}
+      data-l-type={t('brief.msg.type')}
+      data-l-budget={t('brief.msg.budget')}
+      data-l-time={t('brief.msg.time')}
+      data-l-name={t('brief.msg.name')}
+      data-l-details={t('brief.msg.details')}
+    >
+      {
+        groups.map((g) => (
+          <fieldset class="group">
+            <legend>{g.label}</legend>
+            <div class="chips">
+              {g.options.map((o, i) => (
+                <label class="chip">
+                  <input type="radio" name={g.name} value={pick(o, lang)} required={g.required && i === 0} />
+                  <span>{pick(o, lang)}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ))
+      }
+
+      <label class="field">
+        <span>{t('brief.name')}</span>
+        <input type="text" name="name" autocomplete="name" required maxlength="80" />
+      </label>
+      <label class="field">
+        <span>{t('brief.details')}</span>
+        <textarea name="details" rows="3" maxlength="600" placeholder={t('brief.detailsHint')}></textarea>
+      </label>
+
+      <button class="send" type="submit">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 3a9 9 0 00-7.700 13.600L3 21l4.500-1.200A9 9 0 1012 3z" fill="none" stroke="currentColor" stroke-width="2"></path></svg>
+        {t('brief.send')}
+      </button>
+      <p class="note">{t('brief.note')}</p>
+    </form>
+  </div>
+</section>
+
+<style>
+  .brief {
+    padding-block: clamp(4rem, 9vw, 8rem);
+    color: var(--ink-900);
+  }
+
+  .brief__grid {
+    display: grid;
+    gap: var(--sp-8);
+  }
+
+  .brief__head {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-4);
+  }
+
+  .brief__title {
+    font-size: var(--fs-3xl);
+  }
+
+  .brief__head p {
+    margin: 0;
+    max-width: 40ch;
+    color: var(--text-on-cream-muted);
+  }
+
+  .form {
+    display: grid;
+    gap: var(--sp-6);
+    padding: clamp(1.25rem, 3vw, 2.5rem);
+    background: var(--paper);
+    box-shadow: 0 30px 50px -28px rgb(0 0 0 / 0.4);
+  }
+
+  .group {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  legend,
+  .field > span {
+    display: block;
+    margin-bottom: var(--sp-2);
+    padding: 0;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  .chip {
+    position: relative;
+  }
+
+  .chip input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .chip span {
+    display: grid;
+    place-items: center;
+    min-height: 44px;
+    padding: 0 var(--sp-4);
+    border: 1.5px solid var(--ink-900);
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    transition: background-color 0.25s, color 0.25s;
+  }
+
+  .chip:hover span {
+    background: var(--surface-cream);
+  }
+
+  .chip input:checked + span {
+    background: var(--ink-900);
+    color: var(--paper);
+  }
+
+  .chip input:focus-visible + span {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .field input,
+  .field textarea {
+    display: block;
+    width: 100%;
+    padding: var(--sp-3);
+    border: 1.5px solid var(--ink-900);
+    border-radius: 0;
+    background: #fff;
+    color: var(--ink-900);
+    font: inherit;
+    font-size: 1rem; /* 16px stops iPhones zooming in on focus */
+    resize: vertical;
+  }
+
+  .send {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    min-height: 56px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--accent);
+    color: var(--ink-900);
+    font-size: var(--fs-md);
+    font-weight: 700;
+    transition: transform 0.4s var(--ease-spring);
+  }
+
+  .send:hover {
+    transform: translateY(-3px);
+  }
+
+  .note {
+    margin: calc(-1 * var(--sp-3)) 0 0;
+    text-align: center;
+    font-size: var(--fs-xs);
+    color: var(--text-on-cream-muted);
+  }
+
+  @media (min-width: 900px) {
+    .brief__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+  }
+</style>

@@ -76,7 +76,7 @@ const tones = ['coral', 'blue', 'paper', 'coral', 'blue', 'paper'];
             <strong class="top__handle" dir="ltr">{handle}</strong>
           </div>
           <div class="who">
-            <span class="avatar avatar--big"><span class="avatar__in"><Logo /></span></span>
+            <span class="avatar avatar--big"><span class="avatar__in avatar__in--mark"><Logo wordmark={false} /></span></span>
             <ul class="stats">
               <li><strong class="tech">{feed.length}</strong>{t('ig.posts')}</li>
               <li><strong class="tech">{projects.length}</strong>{t('ig.sections')}</li>
@@ -86,6 +86,7 @@ const tones = ['coral', 'blue', 'paper', 'coral', 'blue', 'paper'];
           <div class="bio">
             <strong>{t('about.name')}</strong>
             <p>{t('ig.bio')}</p>
+            <a class="bio__link" href={url} target="_blank" rel="noopener noreferrer" dir="ltr">instagram.com/{handle}</a>
           </div>
           <div class="acts">
             <a class="act act--primary" href={url} target="_blank" rel="noopener noreferrer">{t('ig.follow')}</a>
@@ -142,7 +143,7 @@ const tones = ['coral', 'blue', 'paper', 'coral', 'blue', 'paper'];
             feed.map((post, i) => (
               <article class="post" data-ig-post={i}>
                 <header class="post__head">
-                  <span class="avatar avatar--small"><span class="avatar__in"><Logo /></span></span>
+                  <span class="avatar avatar--small"><span class="avatar__in avatar__in--mark"><Logo wordmark={false} /></span></span>
                   <strong dir="ltr">{handle}</strong>
                 </header>
                 <div class:list={['media', { 'media--square': post.square }]} data-ig-media>
@@ -205,7 +206,7 @@ const tones = ['coral', 'blue', 'paper', 'coral', 'blue', 'paper'];
           <span class="deco" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.800"></rect><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.800"></path></svg></span>
           <span class="deco" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.800"></rect><path d="M10 9.500v5.500l4.500-2.700z" fill="currentColor"></path></svg></span>
           <button class="iconbtn" type="button" data-ig-show="profile" aria-label={t('ig.profile')}>
-            <span class="avatar avatar--nav"><span class="avatar__in"><Logo /></span></span>
+            <span class="avatar avatar--nav"><span class="avatar__in avatar__in--mark"><Logo wordmark={false} /></span></span>
           </button>
         </nav>
 
@@ -214,6 +215,11 @@ const tones = ['coral', 'blue', 'paper', 'coral', 'blue', 'paper'];
       </div>
     </div>
   </div>
+  <a class="cta" href={url} target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3.500" y="3.500" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"></rect><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"></circle><circle cx="17" cy="7" r="1.300" fill="currentColor"></circle></svg>
+    <span>{t('ig.followCta')}</span>
+    <strong dir="ltr">@{handle}</strong>
+  </a>
   <p class="hint">{t('ig.hint')}</p>
 </div>
 
@@ -465,6 +471,11 @@ const tones = ['coral', 'blue', 'paper', 'coral', 'blue', 'paper'];
     color: var(--ink-900);
   }
 
+  /* Coral Y on paper: the logo's own colour would vanish on a coral circle */
+  .avatar__in--mark {
+    background: var(--paper);
+  }
+
   .avatar__in :global(img) {
     width: 100%;
     height: 100%;
@@ -512,6 +523,20 @@ const tones = ['coral', 'blue', 'paper', 'coral', 'blue', 'paper'];
     grid-template-columns: 1fr 1fr;
     gap: 6px;
     padding: 0 12px 12px;
+  }
+
+  .bio__link {
+    display: block;
+    margin-top: 2px;
+    color: #8fc7ff;
+    font-weight: 600;
+    text-align: start;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .bio__link:hover {
+    text-decoration: underline;
   }
 
   .act {
@@ -807,6 +832,30 @@ const tones = ['coral', 'blue', 'paper', 'coral', 'blue', 'paper'];
 
   :global([dir='rtl']) .flip {
     transform: scaleX(-1);
+  }
+
+  .cta {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-1) var(--sp-3);
+    width: fit-content;
+    max-width: calc(100% - 2 * var(--gutter));
+    margin: 0 auto var(--sp-4);
+    padding: var(--sp-3) var(--sp-6);
+    border-radius: var(--radius-pill);
+    background: var(--accent);
+    color: var(--ink-900);
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.4s var(--ease-spring);
+  }
+
+  .cta:hover {
+    transform: translateY(-4px) rotate(-1deg);
   }
 
   .hint {

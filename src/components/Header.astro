@@ -14,6 +14,7 @@ const otherUrl = other === 'ar' ? base : `${base}en/`;
 const links = [
   { href: '#work', label: t('nav.work') },
   { href: '#about', label: t('nav.about') },
+  { href: '#brief', label: t('nav.brief') },
   { href: '#faq', label: t('nav.faq') },
   { href: '#contact', label: t('nav.contact') },
 ];
@@ -86,7 +87,7 @@ const links = [
       <a href={`https://instagram.com/${contact.instagram}`} target="_blank" rel="noopener noreferrer" dir="ltr"
         >@{contact.instagram}</a
       >
-      <a class="menu__cta" href="#contact" data-menu-link>{t('nav.cta')}</a>
+      <a class="menu__cta" href="#brief" data-menu-link>{t('nav.brief')}</a>
     </div>
     </div>
   </nav>

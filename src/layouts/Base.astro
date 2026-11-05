@@ -35,11 +35,12 @@ const jsonLd = {
 // the dev server injects inline scripts for HMR).
 const csp = [
   "default-src 'self'",
-  "script-src 'self'",
+  "script-src 'self' 'wasm-unsafe-eval'",
+  "worker-src 'self' blob:",
   "style-src 'self'",
-  "img-src 'self' data:",
+  "img-src 'self' data: blob:",
   "font-src 'self'",
-  "connect-src 'self'",
+  "connect-src 'self' blob:",
   "media-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",

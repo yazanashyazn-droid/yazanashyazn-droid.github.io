@@ -1,0 +1,366 @@
+---
+// One 3D stage with a tab per model and an X-ray mesh view. Logic lives in scripts/model.ts.
+// Models are listed on the project in data/works.ts; each GLB goes in public/models/.
+import { useT, pick, type Lang } from '../i18n/ui';
+import type { ModelItem } from '../data/works';
+
+interface Props {
+  lang: Lang;
+  models: ModelItem[];
+}
+const { lang, models } = Astro.props;
+const t = useT(lang);
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+
+<div class="mv-wrap" data-model-wrap>
+<figure class="mv" data-model data-draco={`${base}draco/`}>
+  <div class="mv__stage" data-model-canvas role="img" aria-label={pick(models[0].title, lang)}>
+    <span class="mv__status tech" data-model-status dir="ltr" aria-hidden="true"></span>
+    <span class="mv__building" aria-hidden="true">{t('model.building')}</span>
+  </div>
+
+  <div class="mv__tabs" role="group" aria-label={t('model.choose')}>
+    {
+      models.map((m, i) => (
+        <button
+          class="mv__tab"
+          type="button"
+          data-model-tab
+          data-src={`${base}${m.src}`}
+          data-axis={m.explodeAxis?.join(',')}
+          data-spread={m.explodeSpread}
+          data-variants={JSON.stringify((m.variants ?? []).map((v) => ({ ...v, name: pick(v.name, lang) })))}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+        >
+          {pick(m.title, lang)}
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="mv__hud">
+    <div class="mv__modes" role="group" aria-label={t('model.view')}>
+      <button class="mv__mode" type="button" data-model-mode="render" aria-pressed="true" disabled>{t('model.render')}</button>
+      <button class="mv__mode" type="button" data-model-mode="xray" aria-pressed="false" disabled>
+        <span class="mv__dot" aria-hidden="true"></span>{t('model.xray')}
+      </button>
+    </div>
+    <div class="mv__swatches" data-model-swatches role="group" aria-label={t('model.color')}></div>
+    <label class="mv__explode">
+      <span>{t('model.explode')}</span>
+      <input type="range" min="0" max="100" value="0" data-model-explode disabled />
+    </label>
+    <dl class="mv__stats">
+      <div><dt>{t('model.tris')}</dt><dd class="tech" data-model-tris>—</dd></div>
+      <div><dt>{t('model.parts')}</dt><dd class="tech" data-model-parts>—</dd></div>
+    </dl>
+    <p class="mv__hint">{t('model.hint')}</p>
+  </div>
+</figure>
+</div>
+
+<style>
+  /* The stage stays pinned while the extra scroll room below drives the exploded view */
+  .mv-wrap {
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .mv-wrap::after {
+    content: '';
+    display: block;
+    height: 70vh;
+  }
+
+  .mv {
+    position: sticky;
+    top: 72px;
+    margin: 0;
+    overflow: hidden;
+    color: var(--ink-900);
+    background: radial-gradient(circle at 50% 42%, #fffaf5, var(--surface-cream) 62%, #d8d1ca);
+    box-shadow: 0 30px 60px -24px rgb(0 0 0 / 0.7);
+    isolation: isolate;
+  }
+
+  .mv.is-failed {
+    display: none;
+  }
+
+  /* X-ray: the studio goes dark behind the coral mesh lines */
+  .mv::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0;
+    background:
+      linear-gradient(rgb(62 154 175 / 0.12) 1px, transparent 1px) 0 0 / 40px 40px,
+      linear-gradient(90deg, rgb(62 154 175 / 0.12) 1px, transparent 1px) 0 0 / 40px 40px,
+      radial-gradient(circle at 50% 45%, #0f2a33, #070f13 72%);
+    transition: opacity 1.2s var(--ease-out);
+  }
+
+  .mv.is-xray {
+    color: var(--paper);
+  }
+
+  .mv.is-xray::before {
+    opacity: 1;
+  }
+
+  .mv__stage {
+    position: relative;
+    height: clamp(420px, calc(100dvh - 96px), 780px);
+    cursor: grab;
+  }
+
+  .mv__stage:active {
+    cursor: grabbing;
+  }
+
+  .mv__stage :global(canvas) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease-out);
+  }
+
+  .mv.is-ready .mv__stage :global(canvas) {
+    opacity: 1;
+  }
+
+  .mv__status {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    font-size: var(--fs-lg, 1.25rem);
+    pointer-events: none;
+  }
+
+  .mv__building {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    padding: 2px var(--sp-3);
+    background: var(--accent);
+    color: var(--ink-900);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .mv.is-building .mv__building {
+    opacity: 1;
+  }
+
+  .mv__tabs {
+    position: absolute;
+    top: var(--sp-4);
+    inset-inline: var(--sp-4);
+    display: flex;
+    gap: var(--sp-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .mv__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mv__tab {
+    flex: none;
+    min-height: 44px;
+    padding: 0 var(--sp-4);
+    border: 1.5px solid currentColor;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  }
+
+  .mv__tab[aria-pressed='true'] {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--ink-900);
+  }
+
+  .mv__hud {
+    position: absolute;
+    inset-inline: var(--sp-4);
+    bottom: var(--sp-4);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-6);
+    pointer-events: none;
+  }
+
+  .mv__modes {
+    display: inline-flex;
+    padding: 4px;
+    border-radius: var(--radius-pill);
+    background: var(--ink-900);
+    pointer-events: auto;
+    box-shadow: 0 10px 24px rgb(0 0 0 / 0.35);
+  }
+
+  .mv__mode {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: 44px;
+    padding: 0 var(--sp-6);
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: none;
+    color: var(--paper);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .mv__mode[aria-pressed='true'] {
+    background: var(--accent);
+    color: var(--ink-900);
+  }
+
+  .mv__mode:disabled {
+    opacity: 0.5;
+  }
+
+  .mv__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .mv__mode[aria-pressed='true'] .mv__dot {
+    animation: mv-pulse 1.4s infinite;
+  }
+
+  @keyframes mv-pulse {
+    50% {
+      opacity: 0.25;
+    }
+  }
+
+  .mv__swatches {
+    display: flex;
+    gap: var(--sp-2);
+    pointer-events: auto;
+  }
+
+  .mv__swatches :global(button) {
+    width: 28px;
+    height: 28px;
+    margin: 8px 2px;
+    padding: 0;
+    border: 2px solid var(--paper);
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: 0 0 0 1.5px rgb(0 0 0 / 0.35);
+    transition: transform 0.3s var(--ease-spring);
+  }
+
+  .mv__swatches :global(button:hover) {
+    transform: scale(1.15);
+  }
+
+  .mv__swatches :global(button[aria-pressed='true']) {
+    box-shadow: 0 0 0 2px var(--accent);
+    transform: scale(1.15);
+  }
+
+  .mv__explode {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    pointer-events: auto;
+  }
+
+  .mv__explode input {
+    width: 120px;
+    min-height: 44px;
+    margin: 0;
+    accent-color: var(--accent);
+  }
+
+  .mv__stats {
+    display: flex;
+    gap: var(--sp-6);
+    margin: 0;
+    margin-inline-start: auto;
+    font-size: var(--fs-xs);
+  }
+
+  .mv__stats div {
+    display: grid;
+    gap: 1px;
+  }
+
+  .mv__stats dt {
+    opacity: 0.7;
+  }
+
+  .mv__stats dd {
+    margin: 0;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+  }
+
+  .mv__hint {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: var(--fs-xs);
+    opacity: 0.7;
+  }
+
+  /* Below this width the controls sit under the model, so they never cover it */
+  @media (max-width: 900px) {
+    .mv__stage {
+      height: max(320px, calc(100dvh - 330px));
+    }
+    .mv__hud {
+      position: static;
+      padding: var(--sp-2) var(--sp-4) var(--sp-4);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .mv__explode {
+      flex: 1;
+    }
+    .mv__explode input {
+      flex: 1;
+      width: auto;
+    }
+    .mv__mode {
+      padding-inline: var(--sp-4);
+    }
+    .mv__hint {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mv__mode[aria-pressed='true'] .mv__dot {
+      animation: none;
+    }
+  }
+</style>

@@ -65,9 +65,14 @@ function initBubble(eye: HTMLElement, touch: boolean) {
   const bx = gsap.quickTo(bubble, 'x', { duration: 0.6, ease: 'power3' });
   const by = gsap.quickTo(bubble, 'y', { duration: 0.6, ease: 'power3' });
   let open = false;
-  let wobble: gsap.core.Tween | null = null;
+  let timer = 0;
+  let px = 0;
+  let py = 0;
 
-  const follow = (cx: number, cy: number) => {
+  // Only one size animation may run at a time, or they fight over the same values and twitch
+  const stopSize = () => gsap.killTweensOf(bubble, 'scaleX,scaleY,opacity');
+
+  const offset = (cx: number, cy: number) => {
     const r = eye.getBoundingClientRect();
     let dx = cx - (r.left + r.width / 2);
     let dy = cy - (r.top + r.height / 2);
@@ -77,57 +82,87 @@ function initBubble(eye: HTMLElement, touch: boolean) {
       dx = (dx / d) * max;
       dy = (dy / d) * max;
     }
+    return [dx, dy];
+  };
+
+  const follow = (cx: number, cy: number) => {
+    const [dx, dy] = offset(cx, cy);
     bx(dx);
     by(dy);
   };
 
+  const wobble = () => {
+    gsap.to(bubble, { scaleX: 1.04, scaleY: 0.97, duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+  };
+
   const show = (cx: number, cy: number) => {
+    const wasHidden = gsap.getProperty(bubble, 'scaleX') === 0;
     open = true;
-    gsap.killTweensOf(bubble, 'scale,opacity');
-    gsap.set(bubble, { opacity: 1 });
-    gsap.to(bubble, { scale: 1, duration: 0.7, ease: 'elastic.out(1, 0.55)' });
-    wobble = gsap.to(bubble, {
-      scaleX: 1.04,
-      scaleY: 0.97,
-      duration: 0.9,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-      delay: 0.6,
-    });
-    follow(cx, cy);
+    stopSize();
+    if (wasHidden) {
+      // Born under the pointer, not at the spot where it last popped
+      const [dx, dy] = offset(cx, cy);
+      bx(dx, dx);
+      by(dy, dy);
+    } else {
+      follow(cx, cy);
+    }
+    gsap.to(bubble, { opacity: 1, duration: 0.12 });
+    gsap.to(bubble, { scaleX: 1, scaleY: 1, duration: 0.8, ease: 'elastic.out(1, 0.6)', onComplete: wobble });
   };
 
   const pop = () => {
     if (!open) return;
     open = false;
-    wobble?.kill();
+    stopSize();
     const r = bubble.getBoundingClientRect();
     droplets(r.left + r.width / 2, r.top + r.height / 2, r.width / 2);
     gsap.to(bubble, {
-      scale: 1.25,
+      scaleX: 1.25,
+      scaleY: 1.25,
       opacity: 0,
       duration: 0.18,
       ease: 'power2.out',
       onComplete: () => {
-        gsap.set(bubble, { scale: 0, opacity: 1, x: 0, y: 0 });
+        gsap.set(bubble, { scaleX: 0, scaleY: 0 });
       },
     });
   };
 
   if (touch) {
-    let timer = 0;
     eye.addEventListener('pointerdown', (e) => {
-      show(e.clientX, e.clientY);
+      if (open) follow(e.clientX, e.clientY);
+      else show(e.clientX, e.clientY);
       clearTimeout(timer);
       timer = window.setTimeout(pop, 1600);
     });
     return;
   }
 
-  eye.addEventListener('pointerenter', (e) => show(e.clientX, e.clientY));
-  eye.addEventListener('pointermove', (e) => open && follow(e.clientX, e.clientY));
+  eye.addEventListener('pointerenter', (e) => {
+    px = e.clientX;
+    py = e.clientY;
+    show(px, py);
+  });
+  eye.addEventListener('pointermove', (e) => {
+    px = e.clientX;
+    py = e.clientY;
+    if (open) follow(px, py);
+  });
   eye.addEventListener('pointerleave', pop);
+
+  // Scrolling moves the eye out from under a still pointer without any pointer event
+  addEventListener(
+    'scroll',
+    () => {
+      if (!open) return;
+      const r = eye.getBoundingClientRect();
+      const inside = Math.hypot(px - (r.left + r.width / 2), py - (r.top + r.height / 2)) < r.width / 2;
+      if (inside) follow(px, py);
+      else pop();
+    },
+    { passive: true },
+  );
 }
 
 // Tiny droplets flung out when a bubble pops

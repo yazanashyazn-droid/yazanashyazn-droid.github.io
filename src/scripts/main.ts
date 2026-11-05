@@ -1,4 +1,5 @@
 import { initIg, resumeIg } from './ig';
+import { initBrief } from './brief';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -339,6 +340,8 @@ function openGallery(id: string, trigger?: HTMLElement | null) {
     initCompare(dialog);
     const phone = dialog.querySelector<HTMLElement>('[data-ig]');
     if (phone) initIg(phone);
+    const model = dialog.querySelector<HTMLElement>('[data-model]');
+    if (model) import('./model').then((m) => m.initModel(model));
   }
   if (trigger && !trigger.closest('dialog')) opener = trigger;
   dialog.showModal();
@@ -398,6 +401,8 @@ function initCompare(ctx: ParentNode) {
     set();
   });
 }
+
+initBrief();
 
 /* ---------- Email assembled at runtime ---------- */
 $$<HTMLAnchorElement>('[data-email-user]').forEach((a) => {

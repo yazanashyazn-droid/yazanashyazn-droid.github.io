@@ -1,3 +1,4 @@
+import { initIg, resumeIg } from './ig';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -336,12 +337,15 @@ function openGallery(id: string, trigger?: HTMLElement | null) {
   if (tpl) {
     tpl.replaceWith(tpl.content.cloneNode(true));
     initCompare(dialog);
+    const phone = dialog.querySelector<HTMLElement>('[data-ig]');
+    if (phone) initIg(phone);
   }
   if (trigger && !trigger.closest('dialog')) opener = trigger;
   dialog.showModal();
   // A modal dialog renders in the top layer, above the cursor; carry the cursor inside it
   if (cursor) dialog.append(cursor);
   dialog.scrollTop = 0;
+  resumeIg(dialog);
   lenis?.stop();
   history.replaceState(null, '', `#work-${id}`);
 }

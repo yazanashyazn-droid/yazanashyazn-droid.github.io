@@ -1,8 +1,8 @@
 ---
 import { Image } from 'astro:assets';
-import { useT, pick, experience, education, tools, type Lang } from '../i18n/ui';
+import { useT, pick, experience, education, toolGroups, type Lang } from '../i18n/ui';
+import { img } from '../data/works';
 import portrait from '../assets/about/yazan.webp';
-import autocad from '../assets/tools/autocad.webp';
 
 interface Props {
   lang: Lang;
@@ -92,22 +92,23 @@ const roles = t('about.role').split(' • ');
         <span class="cv__num tech">02</span>
         {t('tools.title')}
       </h3>
-      <ul class="tools" data-reveal>
+      <div class="tools">
         {
-          tools.map((tool) => (
-            <li class="tool">
-              {tool.label === 'AutoCAD' ? (
-                <Image class="tool__icon" src={autocad} alt="" width={56} height={56} />
-              ) : (
-                <span class={`tool__icon tool__icon--${tool.short.toLowerCase()}`} aria-hidden="true">
-                  {tool.short}
-                </span>
-              )}
-              <span class="tool__name">{tool.label}</span>
-            </li>
+          toolGroups.map((g) => (
+            <section class:list={['tgroup', `tgroup--${g.items.length}`, { 'tgroup--ai': g.key === 'tools.group.ai' }]} data-reveal>
+              <h4 class="tgroup__label">{t(g.key)}</h4>
+              <ul class="tgroup__list">
+                {g.items.map((tool) => (
+                  <li class="tool">
+                    <Image class="tool__icon" src={img(`tools/${tool.icon}.webp`)} alt="" width={64} height={64} densities={[1, 2]} />
+                    <span class="tool__name" dir="ltr">{tool.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
           ))
         }
-      </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -414,62 +415,90 @@ const roles = t('about.role').split(' • ');
     text-transform: uppercase;
   }
 
-  /* ---------- Tools ---------- */
+  /* ---------- Tools: one card per discipline, wider where there are more apps ---------- */
   .tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+  }
+
+  .tgroup {
+    flex: 1 1 100%;
+    display: grid;
+    align-content: start;
+    gap: var(--sp-4);
+    min-width: 0;
+    padding: var(--sp-4);
+    background: var(--paper);
+    border: 1px solid var(--paper-300);
+    color: var(--ink-900);
+  }
+
+  .tgroup--ai {
+    background: var(--ink-900);
+    border-color: var(--ink-900);
+    color: var(--paper);
+  }
+
+  .tgroup__label {
+    margin: 0;
+    padding-bottom: var(--sp-2);
+    border-bottom: 1px solid currentColor;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+  }
+
+  .tgroup__list {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
-    gap: var(--sp-3);
+    grid-template-columns: repeat(auto-fill, minmax(5.25rem, 1fr));
+    gap: var(--sp-4) var(--sp-2);
   }
 
   .tool {
     display: grid;
     justify-items: center;
     gap: var(--sp-2);
-    padding: var(--sp-4) var(--sp-2);
-    background: var(--paper);
-    border: 1px solid var(--paper-300);
     text-align: center;
     font-size: var(--fs-xs);
     font-weight: 500;
-    transition:
-      transform 0.45s var(--ease-spring),
-      border-color 0.3s;
   }
 
-  .tool:hover {
-    transform: translateY(-6px);
-    border-color: var(--ink-900);
-  }
-
-  .tool:hover .tool__icon {
-    transform: rotate(-8deg) scale(1.1);
+  .tool__name {
+    white-space: nowrap;
   }
 
   .tool__icon {
-    display: grid;
-    place-items: center;
+    display: block;
     width: 56px;
     height: 56px;
-    border-radius: 12px;
-    font-family: var(--font-sans);
-    font-weight: 700;
-    font-size: 1.3rem;
-    object-fit: contain;
+    filter: drop-shadow(0 6px 8px rgb(0 0 0 / 0.18));
     transition: transform 0.45s var(--ease-spring);
   }
 
-  .tool__icon--ps { background: #001e36; color: #31a8ff; box-shadow: inset 0 0 0 2px #31a8ff; }
-  .tool__icon--ai { background: #330000; color: #ff9a00; box-shadow: inset 0 0 0 2px #ff9a00; }
-  .tool__icon--id { background: #49021f; color: #ff3366; box-shadow: inset 0 0 0 2px #ff3366; }
-  .tool__icon--pr,
-  .tool__icon--ae { background: #00005b; color: #9999ff; box-shadow: inset 0 0 0 2px #9999ff; }
-  .tool__icon--bl { background: #e87d0d; color: #fff; border-radius: 50%; }
-  .tool__icon--su { background: #c4332d; color: #fff; }
-  .tool__icon--3 { background: #127b7b; color: #fff; }
-  .tool__icon--r { background: #186bff; color: #fff; }
+  .tool:hover .tool__icon {
+    transform: translateY(-5px) rotate(-6deg) scale(1.08);
+  }
+
+  /* First row: 3 + 2 + 2 apps. Second row: 5 + 4 */
+  @media (min-width: 768px) {
+    .tgroup--2 { flex: 2 1 20%; }
+    .tgroup--3 { flex: 3 1 20%; }
+    .tgroup--4 { flex: 4 1 40%; }
+    .tgroup--5 { flex: 5 1 50%; }
+  }
+
+  /* Phones and tablets: the sticker slips behind the portrait, so the face stays clear */
+  @media (max-width: 1023px) {
+    .portrait__img {
+      z-index: 3;
+    }
+    .sticker--year {
+      z-index: 4;
+    }
+  }
 
   @media (min-width: 1024px) {
     .intro {

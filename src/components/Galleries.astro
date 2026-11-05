@@ -4,6 +4,7 @@
 import { Image } from 'astro:assets';
 import { useT, pick, type Lang } from '../i18n/ui';
 import { projects, img } from '../data/works';
+import SocialPhone from './SocialPhone.astro';
 
 interface Props {
   lang: Lang;
@@ -33,7 +34,7 @@ const t = useT(lang);
         </div>
 
         <div class="gallery__body container">
-          <header class="gallery__head">
+          <header class:list={['gallery__head', { 'gallery__head--compact': p.feed }]}>
             <span class="kicker">{pick(p.category, lang)}</span>
             <h2 class="gallery__title display" id={`gt-${p.id}`}>
               {pick(p.title, lang)}
@@ -63,6 +64,7 @@ const t = useT(lang);
 
           {/* Inert until opened: images inside a <template> are never fetched up front */}
           <template data-gallery-items>
+          {p.feed ? <SocialPhone lang={lang} feed={p.feed} /> : (
           <ul class="gallery__grid">
             {p.items.map((item) => (
               <li class:list={['card', { 'card--wide': item.wide }]}>
@@ -93,6 +95,7 @@ const t = useT(lang);
               </li>
             ))}
           </ul>
+          )}
           </template>
 
           <nav class="gallery__nav" aria-label={t('work.more')}>
@@ -172,6 +175,20 @@ const t = useT(lang);
     gap: var(--sp-4);
     padding-block: var(--sp-8) var(--sp-16);
     max-width: 60rem;
+  }
+
+  /* The phone is the star of this gallery: keep it in the first view */
+  .gallery__head--compact {
+    gap: var(--sp-2);
+    padding-block: 0 var(--sp-2);
+  }
+
+  .gallery__head--compact .gallery__title {
+    font-size: var(--fs-xl);
+  }
+
+  .gallery__head--compact .gallery__summary {
+    font-size: var(--fs-sm);
   }
 
   .gallery__title {

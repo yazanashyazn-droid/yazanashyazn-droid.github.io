@@ -35,6 +35,27 @@ export const ui = {
       'أجمع بين التصميم المعماري والإبداع البصري، من الشعار الأول حتى آخر منشور على السوشل ميديا، لأقدّم حلولاً متكاملة تجمع الجمال الوظيفي والهوية المميزة.',
     'work.kicker': 'أعمال مختارة',
     'work.title': 'أعمال تحكي|قصة كل علامة',
+    'ig.posts': 'منشور',
+    'ig.sections': 'أقسام',
+    'ig.since': 'منذ',
+    'ig.bio': 'مهندس معماري ومصمم غرافيك من دمشق. هويات، سوشل ميديا، 3D وموشن.',
+    'ig.follow': 'متابعة',
+    'ig.message': 'مراسلة',
+    'ig.back': 'رجوع',
+    'ig.feed': 'المنشورات',
+    'ig.like': 'إعجاب',
+    'ig.save': 'حفظ',
+    'ig.home': 'المنشورات',
+    'ig.profile': 'الملف الشخصي',
+    'ig.prev': 'السابق',
+    'ig.next': 'التالي',
+    'ig.open': 'افتح المنشور',
+    'ig.hint': 'جرّبه بنفسك: افتح أي منشور، اسحب الكاروسيل، واضغط مرتين للإعجاب.',
+    'tools.group.design': 'التصميم',
+    'tools.group.motion': 'الموشن والفيديو',
+    'tools.group.arch': '3D والعمارة',
+    'tools.group.render': 'الرندر',
+    'tools.group.ai': 'الذكاء الاصطناعي',
     'work.view': 'عرض',
     'work.more': 'اكتشف المزيد',
     'work.close': 'إغلاق المعرض',
@@ -132,6 +153,27 @@ export const ui = {
       'I bring architectural design and visual creativity together, from the first logo sketch to the last social post, delivering complete solutions that balance function, beauty and a distinctive identity.',
     'work.kicker': 'Selected work',
     'work.title': 'Work that tells|every brand’s story',
+    'ig.posts': 'posts',
+    'ig.sections': 'sections',
+    'ig.since': 'since',
+    'ig.bio': 'Architect and graphic designer from Damascus. Identity, social, motion and 3D.',
+    'ig.follow': 'Follow',
+    'ig.message': 'Message',
+    'ig.back': 'Back',
+    'ig.feed': 'Posts',
+    'ig.like': 'Like',
+    'ig.save': 'Save',
+    'ig.home': 'Posts',
+    'ig.profile': 'Profile',
+    'ig.prev': 'Previous',
+    'ig.next': 'Next',
+    'ig.open': 'Open post',
+    'ig.hint': 'Try it yourself: open any post, swipe the carousel, double-tap to like.',
+    'tools.group.design': 'Design',
+    'tools.group.motion': 'Motion & video',
+    'tools.group.arch': 'Architecture & 3D',
+    'tools.group.render': 'Rendering',
+    'tools.group.ai': 'AI',
     'work.view': 'View',
     'work.more': 'Discover more',
     'work.close': 'Close gallery',
@@ -270,19 +312,50 @@ export const education = {
   },
 };
 
-// Order and colours follow the app icons on the PDF's CV page.
-export const tools = [
-  { label: 'Photoshop', short: 'Ps', bg: '#001e36', fg: '#31a8ff' },
-  { label: 'Illustrator', short: 'Ai', bg: '#330000', fg: '#ff9a00' },
-  { label: 'InDesign', short: 'Id', bg: '#49021f', fg: '#ff3366' },
-  { label: 'Premiere Pro', short: 'Pr', bg: '#00005b', fg: '#9999ff' },
-  { label: 'After Effects', short: 'Ae', bg: '#00005b', fg: '#9999ff' },
-  { label: 'Blender', short: 'Bl', bg: '#e87d0d', fg: '#ffffff' },
-  { label: 'SketchUp', short: 'Su', bg: '#d92c2c', fg: '#ffffff' },
-  { label: '3ds Max', short: '3', bg: '#1c9c9c', fg: '#ffffff' },
-  { label: 'AutoCAD', short: 'A', bg: '#e51050', fg: '#ffffff' },
-  { label: 'Revit', short: 'R', bg: '#186bff', fg: '#ffffff' },
-];
+// Grouped by discipline. Icons live in src/assets/tools/<icon>.webp
+export const toolGroups = [
+  {
+    key: 'tools.group.design',
+    items: [
+      { label: 'Photoshop', icon: 'photoshop' },
+      { label: 'Illustrator', icon: 'illustrator' },
+      { label: 'InDesign', icon: 'indesign' },
+    ],
+  },
+  {
+    key: 'tools.group.motion',
+    items: [
+      { label: 'Premiere Pro', icon: 'premiere' },
+      { label: 'After Effects', icon: 'aftereffects' },
+    ],
+  },
+  {
+    key: 'tools.group.render',
+    items: [
+      { label: 'D5 Render', icon: 'd5render' },
+      { label: 'Lumion', icon: 'lumion' },
+    ],
+  },
+  {
+    key: 'tools.group.arch',
+    items: [
+      { label: 'AutoCAD', icon: 'autocad' },
+      { label: 'Revit', icon: 'revit' },
+      { label: 'SketchUp', icon: 'sketchup' },
+      { label: '3ds Max', icon: '3dsmax' },
+      { label: 'Blender', icon: 'blender' },
+    ],
+  },
+  {
+    key: 'tools.group.ai',
+    items: [
+      { label: 'ChatGPT', icon: 'chatgpt' },
+      { label: 'Claude', icon: 'claude' },
+      { label: 'Gemini', icon: 'gemini' },
+      { label: 'Higgsfield', icon: 'higgsfield' },
+    ],
+  },
+] as const;
 
 // Draft answers — Yazan to review and adjust.
 export const faq: { q: Bilingual; a: Bilingual }[] = [

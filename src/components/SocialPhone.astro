@@ -1,0 +1,828 @@
+---
+// Instagram mockup for the social media gallery: a working phone (profile, feed, swipeable
+// carousels, double-tap likes) that browses itself until the visitor takes over. Posts come
+// from `socialFeed` in data/works.ts. No follower or like numbers: nothing here is invented.
+import { Image } from 'astro:assets';
+import Logo from './Logo.astro';
+import { useT, pick, contact, type Lang } from '../i18n/ui';
+import { projects, img, type FeedPost } from '../data/works';
+
+interface Props {
+  lang: Lang;
+  feed: FeedPost[];
+}
+const { lang, feed } = Astro.props;
+const t = useT(lang);
+const handle = contact.instagram;
+const url = `https://instagram.com/${handle}`;
+const floats = feed.slice(0, 6);
+const tones = ['coral', 'blue', 'paper', 'coral', 'blue', 'paper'];
+---
+
+<div class="ig" data-ig>
+  <div class="scene" data-ig-scene>
+    <span class="bigword display" aria-hidden="true" data-depth="10" dir="ltr">@{handle}</span>
+
+    {
+      floats.map((post, i) => (
+        <button
+          class={`float float--${i + 1}`}
+          type="button"
+          data-ig-go={i}
+          data-depth={[34, 18, 46, 26, 40, 16][i]}
+          data-float
+          aria-label={`${t('ig.open')}: ${pick(post.caption, lang)}`}
+        >
+          <Image src={img(post.images[0])} alt="" widths={[320]} sizes="200px" loading="lazy" />
+        </button>
+      ))
+    }
+
+    <span class="badge badge--1" aria-hidden="true" data-depth="60" data-float>
+      <svg viewBox="0 0 64 64" width="100%" height="100%">
+        <defs>
+          <linearGradient id="ig-grad" x1="10%" y1="100%" x2="90%" y2="0%">
+            <stop offset="0" stop-color="#feda75"></stop>
+            <stop offset="0.35" stop-color="#fa7e1e"></stop>
+            <stop offset="0.6" stop-color="#d62976"></stop>
+            <stop offset="0.82" stop-color="#962fbf"></stop>
+            <stop offset="1" stop-color="#4f5bd5"></stop>
+          </linearGradient>
+        </defs>
+        <rect width="64" height="64" rx="16" fill="url(#ig-grad)"></rect>
+        <rect x="13" y="13" width="38" height="38" rx="11" fill="none" stroke="#fff" stroke-width="4.5"></rect>
+        <circle cx="32" cy="32" r="9" fill="none" stroke="#fff" stroke-width="4.5"></circle>
+        <circle cx="43.5" cy="20.5" r="2.8" fill="#fff"></circle>
+      </svg>
+    </span>
+    <span class="badge badge--2" aria-hidden="true" data-depth="52" data-float>
+      <svg viewBox="0 0 24 24" width="55%" height="55%"><path d="M12 21s-8.5-5.2-8.5-11.4A4.9 4.9 0 0112 6.6a4.9 4.9 0 018.5 3C20.500 15.800 12 21 12 21z" fill="currentColor"></path></svg>
+    </span>
+
+    <div class="ph" data-ig-phone>
+      <span class="ph__btn ph__btn--a" aria-hidden="true"></span>
+      <span class="ph__btn ph__btn--b" aria-hidden="true"></span>
+      <span class="ph__btn ph__btn--c" aria-hidden="true"></span>
+      <div class="ph__screen">
+        <span class="ph__island" aria-hidden="true"></span>
+        <div class="ph__status tech" aria-hidden="true" dir="ltr">
+          <span>9:41</span>
+          <svg viewBox="0 0 34 12" width="34" height="12"><path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 1h2v10h-2z" fill="currentColor"></path><rect x="19" y="1.500" width="13" height="9" rx="2.500" fill="none" stroke="currentColor"></rect><rect x="20.500" y="3" width="9" height="6" rx="1" fill="currentColor"></rect></svg>
+        </div>
+
+        <!-- Profile -->
+        <div class="view is-active" data-ig-view="profile" tabindex="0">
+          <div class="top">
+            <strong class="top__handle" dir="ltr">{handle}</strong>
+          </div>
+          <div class="who">
+            <span class="avatar avatar--big"><span class="avatar__in"><Logo /></span></span>
+            <ul class="stats">
+              <li><strong class="tech">{feed.length}</strong>{t('ig.posts')}</li>
+              <li><strong class="tech">{projects.length}</strong>{t('ig.sections')}</li>
+              <li><strong class="tech">2021</strong>{t('ig.since')}</li>
+            </ul>
+          </div>
+          <div class="bio">
+            <strong>{t('about.name')}</strong>
+            <p>{t('ig.bio')}</p>
+          </div>
+          <div class="acts">
+            <a class="act act--primary" href={url} target="_blank" rel="noopener noreferrer">{t('ig.follow')}</a>
+            <a class="act" href={url} target="_blank" rel="noopener noreferrer">{t('ig.message')}</a>
+          </div>
+          <ul class="stories">
+            {
+              feed.map((post, i) =>
+                post.highlight ? (
+                  <li>
+                    <button class="story" type="button" data-ig-go={i}>
+                      <span class="avatar">
+                        <span class="avatar__in">
+                          <Image src={img(post.images[0])} alt="" widths={[120]} sizes="56px" loading="lazy" />
+                        </span>
+                      </span>
+                      <span class="story__name">{pick(post.highlight, lang)}</span>
+                    </button>
+                  </li>
+                ) : null,
+              )
+            }
+          </ul>
+          <div class="tabline" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 4h16v16H4zM4 9.300h16M4 14.600h16M9.300 4v16M14.600 4v16" fill="none" stroke="currentColor" stroke-width="1.500"></path></svg>
+          </div>
+          <ul class="grid">
+            {
+              feed.map((post, i) => (
+                <li>
+                  <button class="tile" type="button" data-ig-go={i} data-ig-tile={i} aria-label={`${t('ig.open')}: ${pick(post.caption, lang)}`}>
+                    <Image src={img(post.images[0])} alt="" widths={[260]} sizes="120px" loading="lazy" />
+                    {post.images.length > 1 && (
+                      <svg class="tile__multi" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                        <path d="M8 3h13v13h-3V6H8z M3 8h13v13H3z" fill="#fff"></path>
+                      </svg>
+                    )}
+                  </button>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <!-- Feed -->
+        <div class="view" data-ig-view="feed" tabindex="-1">
+          <div class="top top--feed">
+            <button class="iconbtn" type="button" data-ig-show="profile" aria-label={t('ig.back')}>
+              <svg class="flip" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2"></path></svg>
+            </button>
+            <strong>{t('ig.feed')}</strong>
+          </div>
+          {
+            feed.map((post, i) => (
+              <article class="post" data-ig-post={i}>
+                <header class="post__head">
+                  <span class="avatar avatar--small"><span class="avatar__in"><Logo /></span></span>
+                  <strong dir="ltr">{handle}</strong>
+                </header>
+                <div class:list={['media', { 'media--square': post.square }]} data-ig-media>
+                  <div class="track" data-ig-track dir="ltr" tabindex={post.images.length > 1 ? 0 : undefined}>
+                    {post.images.map((src, n) => (
+                      <Image
+                        class="slide"
+                        src={img(src)}
+                        alt={n === 0 ? pick(post.caption, lang) : ''}
+                        widths={[420, 800]}
+                        sizes="340px"
+                        loading="lazy"
+                        draggable="false"
+                      />
+                    ))}
+                  </div>
+                  <svg class="burst" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8.500-5.200-8.500-11.400A4.900 4.900 0 0112 6.600a4.900 4.900 0 018.500 3C20.500 15.800 12 21 12 21z" fill="currentColor"></path></svg>
+                  {post.images.length > 1 && (
+                    <>
+                      <span class="count tech" dir="ltr" data-ig-count>1/{post.images.length}</span>
+                      <button class="arrow arrow--prev" type="button" data-ig-step="-1" aria-label={t('ig.prev')}>
+                        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.500"></path></svg>
+                      </button>
+                      <button class="arrow arrow--next" type="button" data-ig-step="1" aria-label={t('ig.next')}>
+                        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.500"></path></svg>
+                      </button>
+                    </>
+                  )}
+                </div>
+                <div class="post__acts">
+                  <button class="iconbtn like" type="button" data-ig-like aria-pressed="false" aria-label={t('ig.like')}>
+                    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 20.500s-8-5-8-11a4.600 4.600 0 018-2.900 4.600 4.600 0 018 2.900c0 6-8 11-8 11z" fill="none" stroke="currentColor" stroke-width="1.800"></path></svg>
+                  </button>
+                  <span class="deco" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 4a8 8 0 00-7 11.800L4 20l4.200-1A8 8 0 1012 4z" fill="none" stroke="currentColor" stroke-width="1.800"></path></svg>
+                  </span>
+                  <span class="deco" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path d="M21 4L3 10.500l7 2.800L13.500 20z M10 13.300L21 4" fill="none" stroke="currentColor" stroke-width="1.800"></path></svg>
+                  </span>
+                  {post.images.length > 1 && (
+                    <span class="dots" aria-hidden="true" dir="ltr" data-ig-dots>
+                      {post.images.map((_, n) => <i class:list={{ 'is-on': n === 0 }} />)}
+                    </span>
+                  )}
+                  <button class="iconbtn save" type="button" data-ig-save aria-pressed="false" aria-label={t('ig.save')}>
+                    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M6 3.500h12v17l-6-4.500-6 4.500z" fill="none" stroke="currentColor" stroke-width="1.800"></path></svg>
+                  </button>
+                </div>
+                <p class="post__cap"><strong dir="ltr">{handle}</strong> {pick(post.caption, lang)}</p>
+              </article>
+            ))
+          }
+        </div>
+
+        <nav class="nav" aria-label="Instagram">
+          <button class="iconbtn" type="button" data-ig-show="feed" aria-label={t('ig.home')}>
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5.500v-6h-5v6H4z" fill="none" stroke="currentColor" stroke-width="1.800"></path></svg>
+          </button>
+          <span class="deco" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.800"></circle><path d="M16 16l5 5" stroke="currentColor" stroke-width="1.800"></path></svg></span>
+          <span class="deco" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.800"></rect><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.800"></path></svg></span>
+          <span class="deco" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.800"></rect><path d="M10 9.500v5.500l4.500-2.700z" fill="currentColor"></path></svg></span>
+          <button class="iconbtn" type="button" data-ig-show="profile" aria-label={t('ig.profile')}>
+            <span class="avatar avatar--nav"><span class="avatar__in"><Logo /></span></span>
+          </button>
+        </nav>
+
+        <span class="tap" data-ig-tap aria-hidden="true"></span>
+        <span class="ph__bar" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
+  <p class="hint">{t('ig.hint')}</p>
+</div>
+
+<style>
+  .ig {
+    --ph-w: min(82vw, 340px, calc(80dvh * 0.47));
+    margin-inline: calc(-1 * var(--gutter));
+    overflow-x: clip;
+  }
+
+  .scene {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding-block: var(--sp-8) var(--sp-6);
+    perspective: 1400px;
+  }
+
+  .bigword {
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    translate: -50% -50%;
+    font-size: clamp(3rem, 11.5vw, 12rem);
+    line-height: 1;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgb(249 100 80 / 0.35);
+    pointer-events: none;
+  }
+
+  /* Posts floating around the phone, smaller and softer the further back they sit */
+  .float {
+    position: absolute;
+    display: none;
+    width: clamp(120px, 13vw, 200px);
+    aspect-ratio: 4 / 5;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--ink-700);
+    box-shadow: 0 30px 50px -18px rgb(0 0 0 / 0.75);
+    transition: filter 0.4s, box-shadow 0.4s;
+  }
+
+  .float :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .float:hover,
+  .float:focus-visible {
+    z-index: 4;
+    filter: none;
+    box-shadow: 0 0 0 3px var(--accent), 0 30px 50px -18px rgb(0 0 0 / 0.75);
+  }
+
+  .float--1 { top: 4%; left: 6%; rotate: -13deg; filter: blur(1.5px); }
+  .float--2 { top: 38%; left: 19%; rotate: -5deg; scale: 1.12; }
+  .float--3 { bottom: 6%; left: 3%; rotate: 9deg; filter: blur(2.5px); scale: 0.85; }
+  .float--4 { top: 3%; right: 7%; rotate: 11deg; filter: blur(1.5px); }
+  .float--5 { top: 37%; right: 18%; rotate: 6deg; scale: 1.12; }
+  .float--6 { bottom: 5%; right: 3%; rotate: -8deg; filter: blur(2.5px); scale: 0.85; }
+
+  .badge {
+    position: absolute;
+    display: none;
+    place-items: center;
+    pointer-events: none;
+    filter: drop-shadow(0 18px 22px rgb(0 0 0 / 0.55));
+  }
+
+  .badge--1 { top: 9%; right: 29%; width: clamp(56px, 6vw, 92px); rotate: 12deg; }
+  .badge--2 {
+    bottom: 13%;
+    left: 29%;
+    width: clamp(52px, 5vw, 80px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    rotate: -12deg;
+    background: #ff3040;
+    color: #fff;
+  }
+
+  @media (min-width: 1000px) {
+    .float { display: block; }
+    .badge { display: grid; }
+    .scene { min-height: calc(80dvh * 1.08 + 4rem); }
+  }
+
+  /* ---------- Phone ---------- */
+  .ph {
+    position: relative;
+    z-index: 3;
+    width: var(--ph-w);
+    aspect-ratio: 9 / 19.2;
+    padding: 9px;
+    border-radius: calc(var(--ph-w) * 0.15);
+    background: linear-gradient(135deg, #5a5a5e, #1b1b1d 22%, #0c0c0d 70%, #3e3e42);
+    box-shadow:
+      inset 0 0 0 1.5px rgb(255 255 255 / 0.2),
+      0 50px 80px -24px rgb(0 0 0 / 0.85),
+      0 0 90px -18px rgb(249 100 80 / 0.4);
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  .ph__btn {
+    position: absolute;
+    left: -2.5px;
+    width: 3px;
+    border-radius: 2px;
+    background: #38383b;
+  }
+
+  .ph__btn--a { top: 16%; height: 4.5%; }
+  .ph__btn--b { top: 23%; height: 8%; }
+  .ph__btn--c { top: 33%; height: 8%; }
+
+  .ph__screen {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border-radius: calc(var(--ph-w) * 0.125);
+    background: #000;
+    color: #f5f5f5;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .ph__island {
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    z-index: 6;
+    width: 31%;
+    height: 24px;
+    translate: -50% 0;
+    border-radius: 14px;
+    background: #000;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.06);
+  }
+
+  .ph__status {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 42px;
+    padding: 8px 22px 0;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .ph__bar {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    z-index: 6;
+    width: 34%;
+    height: 4px;
+    translate: -50% 0;
+    border-radius: 2px;
+    background: #f5f5f5;
+    pointer-events: none;
+  }
+
+  .view {
+    flex: 1;
+    display: none;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    outline-offset: -2px;
+  }
+
+  .view::-webkit-scrollbar,
+  .track::-webkit-scrollbar,
+  .stories::-webkit-scrollbar {
+    display: none;
+  }
+
+  .view.is-active {
+    display: block;
+    animation: view-in 0.35s var(--ease-out);
+  }
+
+  @keyframes view-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  @media (hover: hover) {
+    .view {
+      overscroll-behavior: contain;
+    }
+  }
+
+  .top {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 4px 12px;
+    background: #000;
+    font-size: 14px;
+  }
+
+  .top--feed {
+    padding-inline: 4px;
+  }
+
+  .who {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 6px 12px 10px;
+  }
+
+  .avatar {
+    display: block;
+    flex: none;
+    width: 52px;
+    height: 52px;
+    padding: 2px;
+    border-radius: 50%;
+    background: conic-gradient(from 210deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5, #feda75);
+  }
+
+  .avatar__in {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border: 2px solid #000;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--ink-900);
+  }
+
+  .avatar__in :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .avatar__in :global(svg) {
+    width: 66%;
+    height: auto;
+  }
+
+  .avatar--big { width: 74px; height: 74px; }
+  .avatar--small { width: 30px; height: 30px; }
+  .avatar--small .avatar__in { border-width: 1px; }
+  .avatar--nav { width: 25px; height: 25px; padding: 1px; }
+  .avatar--nav .avatar__in { border-width: 1px; }
+
+  .stats {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-size: 11px;
+  }
+
+  .stats strong {
+    display: block;
+    font-size: 15px;
+  }
+
+  .bio {
+    padding: 0 12px 10px;
+  }
+
+  .bio p {
+    margin: 2px 0 0;
+    color: #dcdcdc;
+  }
+
+  .acts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 0 12px 12px;
+  }
+
+  .act {
+    display: grid;
+    place-items: center;
+    min-height: 32px;
+    border-radius: 8px;
+    background: #262626;
+    font-weight: 600;
+    text-decoration: none;
+    transition: filter 0.2s;
+  }
+
+  .act--primary {
+    background: var(--accent);
+    color: var(--ink-900);
+  }
+
+  .act:hover {
+    filter: brightness(1.15);
+  }
+
+  .stories {
+    display: flex;
+    gap: 12px;
+    list-style: none;
+    margin: 0;
+    padding: 0 12px 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .story {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    width: 60px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font-size: 10.5px;
+  }
+
+  .story__name {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tabline {
+    display: grid;
+    place-items: center;
+    padding-block: 6px;
+    border-top: 1px solid #262626;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 2px 0 0;
+  }
+
+  .tile {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    background: #161616;
+  }
+
+  .tile :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .tile:hover :global(img) {
+    transform: scale(1.06);
+  }
+
+  .tile__multi {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.6));
+  }
+
+  /* ---------- Feed post ---------- */
+  .post {
+    padding-bottom: 12px;
+  }
+
+  .post__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+  }
+
+  .media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: #161616;
+    touch-action: pan-x pan-y;
+  }
+
+  .media--square {
+    aspect-ratio: 1;
+  }
+
+  .track {
+    display: flex;
+    height: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    scroll-snap-align: start;
+    user-select: none;
+  }
+
+  .burst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 34%;
+    translate: -50% -50%;
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 6px 18px rgb(0 0 0 / 0.5));
+  }
+
+  .burst.is-on {
+    animation: burst 0.9s var(--ease-spring);
+  }
+
+  @keyframes burst {
+    0% { opacity: 0; transform: scale(0.3) rotate(-14deg); }
+    25% { opacity: 1; transform: scale(1.15) rotate(-6deg); }
+    70% { opacity: 1; transform: scale(1) rotate(-6deg); }
+    100% { opacity: 0; transform: scale(1.3) translateY(-30px) rotate(-6deg); }
+  }
+
+  .count {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgb(0 0 0 / 0.65);
+    color: #fff;
+    font-size: 10.5px;
+    pointer-events: none;
+  }
+
+  .arrow {
+    position: absolute;
+    top: 50%;
+    display: none;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    margin-top: -13px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.85);
+    color: #111;
+  }
+
+  .arrow--prev { left: 6px; }
+  .arrow--next { right: 6px; }
+
+  @media (hover: hover) {
+    .media:hover .arrow {
+      display: grid;
+    }
+  }
+
+  .post__acts {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px 2px;
+  }
+
+  .iconbtn {
+    display: inline-grid;
+    place-items: center;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+  }
+
+  .post__acts .iconbtn {
+    min-width: 28px;
+  }
+
+  .deco {
+    display: inline-grid;
+    place-items: center;
+  }
+
+  .like[aria-pressed='true'] {
+    color: #ff3040;
+    animation: pop 0.45s var(--ease-spring);
+  }
+
+  .like[aria-pressed='true'] path,
+  .save[aria-pressed='true'] path {
+    fill: currentColor;
+  }
+
+  @keyframes pop {
+    40% { transform: scale(1.35); }
+  }
+
+  .dots {
+    position: absolute;
+    left: 50%;
+    display: flex;
+    gap: 4px;
+    translate: -50% 0;
+  }
+
+  .dots :global(i) {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #555;
+    transition: background-color 0.2s;
+  }
+
+  .dots :global(i.is-on) {
+    background: var(--accent);
+  }
+
+  .save {
+    margin-inline-start: auto;
+  }
+
+  .post__cap {
+    margin: 0;
+    padding: 4px 10px 0;
+  }
+
+  .nav {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 6px 8px 16px;
+    border-top: 1px solid #262626;
+    background: #000;
+  }
+
+  .tap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 7;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.28);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  :global([dir='rtl']) .flip {
+    transform: scaleX(-1);
+  }
+
+  .hint {
+    margin: 0 auto;
+    padding-inline: var(--gutter);
+    max-width: 44ch;
+    text-align: center;
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .burst.is-on,
+    .view.is-active,
+    .like[aria-pressed='true'] {
+      animation: none;
+    }
+  }
+</style>

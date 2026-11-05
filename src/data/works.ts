@@ -31,6 +31,15 @@ export interface WorkItem {
   wide?: boolean;
 }
 
+export interface FeedPost {
+  /** One image is a post, several are a swipeable carousel. */
+  images: string[];
+  caption: Bilingual;
+  /** Optional story circle at the top of the profile. */
+  highlight?: Bilingual;
+  square?: boolean;
+}
+
 export interface Project {
   id: string;
   title: Bilingual;
@@ -41,6 +50,8 @@ export interface Project {
   summary: Bilingual;
   palette?: string[];
   items: WorkItem[];
+  /** Replaces the gallery grid with the Instagram phone mockup. */
+  feed?: FeedPost[];
 }
 
 const page = (n: number, title: Bilingual): WorkItem => ({
@@ -51,13 +62,50 @@ const page = (n: number, title: Bilingual): WorkItem => ({
 
 const identity: Bilingual = { ar: 'هوية بصرية', en: 'Visual identity' };
 
+/*
+ * INSTAGRAM PHONE (social media gallery)
+ * To add a post: drop the image into src/assets/works/social/feed/ (4:5 looks best) and add a line
+ * at the top of this list. The profile grid, feed and story circles build themselves.
+ */
+const socialFeed: FeedPost[] = [
+  {
+    images: [1, 2, 3, 4, 5].map((n) => `works/social/feed/yzn-${n}.webp`),
+    caption: { ar: 'كاروسيل تعريفي متصل: مين YZN وشو خدماتنا. اسحب للآخر.', en: 'A seamless intro carousel: who YZN is and what we do. Swipe to the end.' },
+    highlight: { ar: 'كاروسيل', en: 'Carousel' },
+  },
+  {
+    images: ['works/social/feed/eid.webp'],
+    caption: { ar: 'بطاقة تهنئة بعيد الفطر لأسرة جامع الأنيس.', en: 'Eid al-Fitr greeting for the Al-Anees Mosque family.' },
+    highlight: { ar: 'عيد الفطر', en: 'Eid' },
+  },
+  {
+    images: ['works/social/feed/smash.webp'],
+    caption: { ar: 'الجبنة بتحوب معك: حملة Smash Burger.', en: 'A campaign visual for Smash Burger.' },
+    highlight: { ar: 'Smash', en: 'Smash' },
+    square: true,
+  },
+  {
+    images: ['works/social/feed/ramadan.webp'],
+    caption: { ar: 'منشور رمضاني بأسلوب هادئ يخدم النص.', en: 'A calm Ramadan post that lets the words lead.' },
+    highlight: { ar: 'رمضان', en: 'Ramadan' },
+  },
+  {
+    images: ['works/social/feed/itikaf.webp'],
+    caption: { ar: 'إعلان الاعتكاف: كل المعلومات بنظرة واحدة.', en: 'An i\u2019tikaf announcement with every detail at a glance.' },
+  },
+  {
+    images: ['works/social/feed/donate.webp'],
+    caption: { ar: 'حملة دعم إفطار وسحور الشباب المعتكفين.', en: 'A donation campaign for the i\u2019tikaf meals.' },
+  },
+];
+
 export const projects: Project[] = [
   {
     id: 'smash',
     title: { ar: 'Smash Burger', en: 'Smash Burger' },
     category: identity,
     year: '2025',
-    cover: 'pages/p04.webp',
+    cover: 'covers/smash.webp',
     summary: {
       ar: 'تم تطوير الهوية البصرية لعلامة SMASH من خلال عملية تصميم مدروسة بدأت بفهم عميق لرؤية العميل وأهدافه، وانتهت ببناء نظام بصري متكامل يعكس شخصية البراند ويعزز حضوره في السوق.',
       en: 'A complete visual identity for SMASH, built through a careful process that started with the client’s vision and goals and ended in a coherent visual system that expresses the brand and strengthens its market presence.',
@@ -79,7 +127,7 @@ export const projects: Project[] = [
     title: { ar: 'نواف المطيري', en: 'Nawaf Al-Mutairi' },
     category: identity,
     year: '2025',
-    cover: 'pages/p13.webp',
+    cover: 'covers/nawaf.webp',
     summary: {
       ar: 'شعار بأسلوب الخط العربي الحر يعكس الأصالة والهوية الثقافية العربية، مع لمسة عصرية تعزز من حضوره البصري، ويعبّر عن الهيبة والوقار والتميز.',
       en: 'A free-form Arabic calligraphy mark reflecting authenticity and Arab cultural identity, with a contemporary touch that expresses presence, dignity and distinction.',
@@ -98,7 +146,7 @@ export const projects: Project[] = [
     title: { ar: 'مجمع العافية الطبي الخيري', en: 'Al-Afia Medical Complex' },
     category: identity,
     year: '2025',
-    cover: 'pages/p17.webp',
+    cover: 'covers/afia.webp',
     summary: {
       ar: 'هوية بصرية تعكس رؤية إنسانية متكاملة للرعاية الصحية؛ شعار يجمع بين رمز القلب ورمز اليد في تداخل متناغم يجسّد قيم الرحمة والعطاء ممزوجة بالاحترافية الطبية والموثوقية.',
       en: 'An identity expressing a humane vision of healthcare: a mark that interlocks a heart and a hand, embodying compassion and giving alongside medical professionalism and trust.',
@@ -116,7 +164,7 @@ export const projects: Project[] = [
     title: { ar: 'مجموعة شعارات', en: 'Logo collection' },
     category: { ar: 'شعارات', en: 'Logos' },
     year: '2021 — 2026',
-    cover: 'pages/p19.webp',
+    cover: 'covers/logos.webp',
     summary: {
       ar: 'شعارات لشركات تقنية، مكاتب هندسية، مساجد ومشاريع شخصية — من الأشكال الهندسية الحديثة إلى الخط العربي الحر والكوفي المربع.',
       en: 'Marks for tech companies, engineering offices, mosques and personal brands — from modern geometric forms to free Arabic calligraphy and square Kufic.',
@@ -128,7 +176,7 @@ export const projects: Project[] = [
       { image: 'logos/mark.webp', title: { ar: 'رمز', en: 'Monogram' } },
       { image: 'logos/bracketflow.webp', title: { ar: 'Bracket Flow', en: 'Bracket Flow' } },
       { image: 'logos/barbus.webp', title: { ar: 'Barbus Code', en: 'Barbus Code' } },
-      { image: 'logos/haykal.webp', title: { ar: 'هيكل', en: 'Haykal' } },
+      { image: 'logos/hadeel.webp', title: { ar: 'هديل', en: 'Hadeel' } },
       { image: 'logos/kufic.webp', title: { ar: 'كوفي مربع', en: 'Square Kufic' } },
       { image: 'logos/osama.webp', title: { ar: 'م. أسامة الحسيني', en: 'Arc. Osama Al-Houssieni' } },
       { image: 'logos/madaryara.webp', title: { ar: 'مدار يارا', en: 'Madar Yara Co.' } },
@@ -138,10 +186,11 @@ export const projects: Project[] = [
   },
   {
     id: 'social',
+    feed: socialFeed,
     title: { ar: 'منشورات وكاروسيل', en: 'Posts & carousels' },
     category: { ar: 'سوشل ميديا', en: 'Social media' },
     year: '2024 — 2026',
-    cover: 'pages/p22.webp',
+    cover: 'covers/social.webp',
     summary: {
       ar: 'تصاميم لجميع منصات التواصل الاجتماعي: منشورات مناسبات، حملات توعوية وتصاميم كاروسيل تحكي قصة الخدمة خطوة بخطوة.',
       en: 'Designs for every social platform: occasion posts, awareness campaigns and carousels that tell a service’s story step by step.',
@@ -159,7 +208,7 @@ export const projects: Project[] = [
     title: { ar: 'منشورات وبروشورات', en: 'Flyers & brochures' },
     category: { ar: 'مطبوعات', en: 'Print' },
     year: '2024 — 2026',
-    cover: 'pages/p25.webp',
+    cover: 'covers/print.webp',
     summary: {
       ar: 'منشورات إعلانية تناسب هوية الجهة وتطرح المعلومات بطريقة واضحة، وبروشورات شركات جاهزة للطباعة.',
       en: 'Promotional flyers that fit each client’s identity and present information clearly, plus print-ready company brochures.',
@@ -175,7 +224,7 @@ export const projects: Project[] = [
     title: { ar: 'رندرات منتجات', en: 'Product renders' },
     category: { ar: 'تصاميم 3D', en: '3D design' },
     year: '2025',
-    cover: 'pages/p27.webp',
+    cover: 'covers/3d.webp',
     summary: {
       ar: 'نمذجة وإضاءة ورندر منتجات واقعية باستخدام Blender — من النموذج الخام حتى الصورة النهائية.',
       en: 'Modelling, lighting and photoreal product rendering in Blender — from the raw model to the final image.',
